@@ -13,7 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import indicator
-from . import inputsource
-from . import investor
-from . import market
+class _Investor:
+    def __init__(self, market, exchange_amount, base_amount):
+        self.market = market
+        self.market.balance[self.market.exchange_currency] = exchange_amount
+        self.market.balance[self.market.base_currency] = base_amount
+
+    def tick(self):
+        pass
+
+from ._singleindicator_investor import SingleIndicatorInvestor
