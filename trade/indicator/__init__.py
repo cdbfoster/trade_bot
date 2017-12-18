@@ -25,4 +25,7 @@ class _Indicator:
     def get_signal(self):
         pass
 
+    def update(self, steps=1):
+        pass
+
 from ._emacrossover_indicator import EMACrossoverIndicator

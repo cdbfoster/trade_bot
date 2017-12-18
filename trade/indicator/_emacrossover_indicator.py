@@ -35,6 +35,17 @@ class EMACrossoverIndicator(_Indicator):
         difference = self.__short_ema - self.__long_ema
         return Signal.BUY if difference > 0 else Signal.SELL
 
+    def update(self, steps=1):
+        if self.__short_ema is None or self.__long_ema is None:
+            self.__initialize__()
+        else:
+            short_weight = 2 / (self.__short_period + 1)
+            long_weight = 2 / (self.__long_period + 1)
+
+            for i in range(-steps, 0):
+                self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, short_weight)
+                self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, long_weight)
+
     def __initialize__(self):
         if len(self.__input_source) < 2 * self.__long_period:
             self.__short_ema = None
