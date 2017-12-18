@@ -16,18 +16,46 @@
 from trade.inputsource import _InputSource
 
 class HistoricalInputSource(_InputSource):
-    def __init__(self, filename, start=None):
+    def __init__(self, filename, start=None, position=None):
         self.__prices = list(float(line.strip()) for line in open(filename))
-        self.position = start
+        self.start = 0
+
+        if start is not None:
+            self.start = start if start >= 0 else len(self.__prices) + start
+
+        self.position = len(self.__prices) - self.start
+
+        if position is not None:
+            self.position = self.__actual_position(position)
 
     def __getitem__(self, value):
-        return self.__prices[:self.position][value]
+        if isinstance(value, int):
+            position = self.__actual_position(value)
+            if position >= self.position or position < 0:
+                raise IndexError
+            return self.__prices[position + self.start]
+        elif isinstance(value, slice):
+            start = min(max(self.__actual_position(value.start) if value.start is not None else 0, 0), self.position - 1) + self.start
+            stop = min(max(self.__actual_position(value.stop) if value.stop is not None else self.position, 0), self.position) + self.start
+            step = value.step
+            return self.__prices[start:stop:step]
+        else:
+            raise TypeError
 
     def __len__(self):
-        return len(self.__prices[:self.position])
+        return self.position
 
     def update(self, steps=1):
         self.position = None if self.position is None else self.position + 1
 
     def total_len(self):
         return len(self.__prices)
+
+    def remaining(self):
+        return self.total_len() - len(self) - self.start
+
+    def __actual_position(self, position):
+        if position >= 0:
+            return position
+        else:
+            return self.position + position

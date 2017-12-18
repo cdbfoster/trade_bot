@@ -17,9 +17,9 @@ from trade.inputsource import HistoricalInputSource
 from trade.market import _Market
 
 class HistoricalMarket(_Market, HistoricalInputSource):
-    def __init__(self, exchange_currency, base_currency, filename, start=None):
+    def __init__(self, exchange_currency, base_currency, filename, start=None, position=None):
         _Market.__init__(self, exchange_currency, base_currency)
-        HistoricalInputSource.__init__(self, filename, start)
+        HistoricalInputSource.__init__(self, filename, start, position)
 
     def buy(self, currency, amount):
         other = self.exchange_currency if currency == self.base_currency else self.base_currency
