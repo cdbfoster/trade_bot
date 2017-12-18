@@ -14,10 +14,14 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 class _Investor:
-    def __init__(self, market, exchange_amount, base_amount):
+    def __init__(self, market, exchange_amount=None, base_amount=None):
         self.market = market
-        self.market.balance[self.market.exchange_currency] = exchange_amount
-        self.market.balance[self.market.base_currency] = base_amount
+
+        if exchange_amount is not None:
+            self.market.balance[self.market.exchange_currency] = exchange_amount
+
+        if base_amount is not None:
+            self.market.balance[self.market.base_currency] = base_amount
 
     def tick(self):
         pass
