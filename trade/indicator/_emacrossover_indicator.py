@@ -39,18 +39,18 @@ class EMACrossoverIndicator(_Indicator):
         if self.__short_ema is None or self.__long_ema is None:
             self.__initialize__()
         else:
-            short_weight = 2 / (self.__short_period + 1)
-            long_weight = 2 / (self.__long_period + 1)
-
             for i in range(-steps, 0):
-                self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, short_weight)
-                self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, long_weight)
+                self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, self.__short_weight)
+                self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, self.__long_weight)
 
     def __initialize__(self):
         if len(self.__input_source) < 2 * self.__long_period:
             self.__short_ema = None
             self.__long_ema = None
             return False
+
+        self.__short_weight = 2 / (self.__short_period + 1)
+        self.__long_weight = 2 / (self.__long_period + 1)
 
         self.__short_ema = _ema(self.__input_source, self.__short_period)
         self.__long_ema = _ema(self.__input_source, self.__long_period)
