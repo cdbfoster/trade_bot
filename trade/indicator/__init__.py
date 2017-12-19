@@ -17,9 +17,9 @@ from enum import Enum as _Enum
 from enum import auto as _auto
 
 class Signal(_Enum):
-    BUY = _auto()
-    HOLD = _auto()
-    SELL = _auto()
+    BUY = 1
+    HOLD = 0
+    SELL = -1
 
 class _Indicator:
     def get_signal(self):
