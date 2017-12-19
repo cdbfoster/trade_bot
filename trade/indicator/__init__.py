@@ -29,3 +29,4 @@ class _Indicator:
         pass
 
 from ._emacrossover_indicator import EMACrossoverIndicator
+from ._macdsignalcrossover_indicator import MACDSignalCrossoverIndicator
