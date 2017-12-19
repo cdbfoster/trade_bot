@@ -16,8 +16,11 @@
 from trade.inputsource import _InputSource
 
 class HistoricalInputSource(_InputSource):
-    def __init__(self, filename, start=None, position=None):
+    def __init__(self, filename, start=None, position=None, reverse=False):
         self.__prices = list(float(line.strip()) for line in open(filename))
+        if reverse:
+            self.__prices = self.__prices[::-1]
+
         self.start = 0
 
         if start is not None:
