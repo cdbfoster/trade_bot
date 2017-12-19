@@ -30,11 +30,11 @@ class SingleIndicatorInvestor(_Investor):
         if signal is None or signal == _Signal.HOLD:
             return
 
-        if signal == _Signal.SELL and (self.position == 1 or (self.position == 0 and self.market.balance[self.market.exchange_currency] > 0)):
+        if signal == _Signal.SELL and self.market.balance[self.market.exchange_currency] > 0:
             amount = self.market.balance[self.market.exchange_currency] * self.trade_percent
             self.market.sell(self.market.exchange_currency, amount)
-            self.position = -1
-        elif signal == _Signal.BUY and (self.position == -1 or (self.position == 0 and self.market.balance[self.market.base_currency] > 0)):
+            self.position -= 1
+        elif signal == _Signal.BUY and self.market.balance[self.market.base_currency] > 0:
             amount = self.market.balance[self.market.base_currency] * self.trade_percent
             self.market.sell(self.market.base_currency, amount)
-            self.position = 1
+            self.position += 1
