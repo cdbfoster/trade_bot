@@ -13,8 +13,4 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import indicator
-from . import inputsource
-from . import investor
-from . import market
-from . import util
+from ._tradebenchmarker import TradeBenchmarker
