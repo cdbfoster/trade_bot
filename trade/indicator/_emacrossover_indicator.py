@@ -18,10 +18,14 @@ import numpy as np
 from trade.indicator import _Indicator, Signal
 
 class EMACrossoverIndicator(_Indicator):
-    def __init__(self, input_source, short_period, long_period):
+    def __init__(self, input_source, short_period, long_period, debug=None):
         self.__input_source = input_source
         self.__short_period = short_period
         self.__long_period = long_period
+        self.debug = debug
+
+        if self.debug is not None:
+            self.debug.write("input short long\n")
 
         self.__short_ema = None
         self.__long_ema = None
@@ -42,6 +46,9 @@ class EMACrossoverIndicator(_Indicator):
             for i in range(-steps, 0):
                 self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, self.__short_weight)
                 self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, self.__long_weight)
+
+                if self.debug is not None:
+                    self.debug.write("{} {} {}\n".format(self.__input_source[i], self.__short_ema, self.__long_ema))
 
     def __initialize__(self):
         if len(self.__input_source) < 2 * self.__long_period:
