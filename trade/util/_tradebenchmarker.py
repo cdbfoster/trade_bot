@@ -18,13 +18,13 @@ import numpy as np
 
 class TradeBenchmarker:
     def __init__(self, prices, average_distance=18):
-        prefix = math.floor(average_distance / 2) if average_distance % 2 != 0 else average_distance / 2
+        prefix = average_distance // 2
         suffix = average_distance - prefix
 
         averaged_prices = [np.mean(prices[i - prefix: i + suffix]) for i in range(prefix, len(prices) - suffix + 1)]
 
-        self.averaged_prices = averaged_prices
-        self.extrema = [0] * len(prices)
+        averaged_prices = averaged_prices
+        extrema = [0] * len(prices)
         hold = None
         for i in range(1, len(averaged_prices) - 1):
             before = averaged_prices[i] - averaged_prices[i - 1]
@@ -43,4 +43,44 @@ class TradeBenchmarker:
                 after_sign = math.copysign(1, after)
 
                 if before_sign != after_sign:
-                    self.extrema[i + prefix] = 1 if before_sign > 0 else -1
+                    extrema[i + prefix] = 1 if before_sign > 0 else -1
+
+        self.extrema = extrema
+
+        self.benchmark = 100 * (prices[-1] / prices[0] - 1)
+
+        self.maximum = [prices[0], 0]
+        self.minimum = [prices[0], 0]
+
+        first_extreme = None
+        for e in extrema:
+            if e != 0:
+                first_extreme = e
+                break
+
+        if first_extreme == 1:
+            self.maximum = [0, 1]
+        elif first_extreme == -1:
+            self.minimum = [0, 1]
+
+        for i in range(len(prices)):
+            if extrema[i] == 1:
+                if self.maximum[1] > 0:
+                    self.maximum[0] += prices[i] * self.maximum[1]
+                    self.maximum[1] = 0
+                if self.minimum[0] > 0:
+                    self.minimum[1] += self.minimum[0] / prices[i]
+                    self.minimum[0] = 0
+            elif extrema[i] == -1:
+                if self.maximum[0] > 0:
+                    self.maximum[1] += self.maximum[0] / prices[i]
+                    self.maximum[0] = 0
+                if self.minimum[1] > 0:
+                    self.minimum[0] += prices[i] * self.minimum[1]
+                    self.minimum[1] = 0
+
+        self.maximum[0] += prices[-1] * self.maximum[1]
+        self.minimum[0] += prices[-1] * self.minimum[1]
+
+        self.maximum = 100 * (self.maximum[0] / prices[0] - 1)
+        self.minimum = 100 * (self.minimum[0] / prices[0] - 1)
