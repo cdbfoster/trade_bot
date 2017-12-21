@@ -36,5 +36,5 @@ class SingleIndicatorInvestor(_Investor):
             self.position -= 1
         elif signal == _Signal.BUY and self.market.balance[self.market.base_currency] > 0:
             amount = self.market.balance[self.market.base_currency] * self.trade_percent
-            self.market.sell(self.market.base_currency, amount)
+            self.market.buy(self.market.exchange_currency, amount)
             self.position += 1

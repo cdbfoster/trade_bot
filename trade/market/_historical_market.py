@@ -21,11 +21,11 @@ class HistoricalMarket(_Market, HistoricalInputSource):
         _Market.__init__(self, exchange_currency, base_currency)
         HistoricalInputSource.__init__(self, filename, start, position, reverse)
 
-    def buy(self, currency, amount):
+    def buy(self, currency, other_amount):
         other = self.exchange_currency if currency == self.base_currency else self.base_currency
-        rate = self[-1] if currency == self.exchange_currency else 1 / self[-1]
+        rate = 1 / self[-1] if currency == self.exchange_currency else self[-1]
 
-        other_amount = amount * rate
+        amount = other_amount * rate
         if self.balance[other] < other_amount:
             return False
 

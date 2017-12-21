@@ -25,7 +25,7 @@ class _Market:
             base_currency: 0.0,
         }
 
-    def buy(self, currency, amount):
+    def buy(self, currency, other_amount):
         pass
 
     def sell(self, currency, amount):
