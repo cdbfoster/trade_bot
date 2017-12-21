@@ -17,11 +17,12 @@ from trade.indicator import Signal
 from trade.investor import _Investor
 
 class SingleIndicatorInvestor(_Investor):
-    def __init__(self, market, indicator, trade_percent, exchange_amount=None, base_amount=None):
+    def __init__(self, market, indicator, trade_percent=1.0, maximum_trade=None, exchange_amount=None, base_amount=None):
         _Investor.__init__(self, market, exchange_amount, base_amount)
 
         self.indicator = indicator
         self.trade_percent = trade_percent
+        self.maximum_trade = maximum_trade
         self.position = 0
 
     def tick(self):
@@ -32,9 +33,14 @@ class SingleIndicatorInvestor(_Investor):
 
         if signal == Signal.SELL and self.market.balance[self.market.exchange_currency] > 0:
             amount = self.market.balance[self.market.exchange_currency] * self.trade_percent
+            if self.maximum_trade is not None:
+                amount = min(amount, self.maximum_trade)
             self.market.sell(self.market.exchange_currency, amount)
             self.position -= 1
         elif signal == Signal.BUY and self.market.balance[self.market.base_currency] > 0:
             amount = self.market.balance[self.market.base_currency] * self.trade_percent
+            if self.maximum_trade is not None:
+                maximum = self.market[-1] * self.maximum_trade
+                amount = min(amount, maximum)
             self.market.buy(self.market.exchange_currency, amount)
             self.position += 1
