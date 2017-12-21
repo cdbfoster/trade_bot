@@ -19,11 +19,10 @@ import numpy as np
 from trade.indicator import _Indicator, Signal
 
 class RSIIndicator(_Indicator):
-    def __init__(self, input_source, period=14, overbought_threshold=0.7, oversold_threshold=0.3, debug=None):
+    def __init__(self, input_source, period=14, threshold=0.3, debug=None):
         self.__input_source = input_source
         self.__period = period
-        self.__overbought_threshold = overbought_threshold
-        self.__oversold_threshold = oversold_threshold
+        self.__threshold = threshold
         self.debug = debug
 
         if self.debug is not None:
@@ -39,9 +38,9 @@ class RSIIndicator(_Indicator):
                 return None
 
         rsi = 1 - 1 / (1 + self.__average_gain / abs(self.__average_loss))
-        if rsi > self.__overbought_threshold:
+        if rsi > 1 - self.__threshold:
             return Signal.SELL
-        elif rsi < self.__oversold_threshold:
+        elif rsi < self.__threshold:
             return Signal.BUY
         else:
             return Signal.HOLD
