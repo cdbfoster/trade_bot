@@ -25,7 +25,7 @@ class EMACrossoverIndicator(_Indicator):
         self.debug = debug
 
         if self.debug is not None:
-            self.debug.write("input short long\n")
+            self.debug.write("input short long signal\n")
 
         self.__short_ema = None
         self.__long_ema = None
@@ -48,7 +48,13 @@ class EMACrossoverIndicator(_Indicator):
                 self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, self.__long_weight)
 
                 if self.debug is not None:
-                    self.debug.write("{} {} {}\n".format(self.__input_source[i], self.__short_ema, self.__long_ema))
+                    signal = self.get_signal()
+                    self.debug.write("{} {} {} {}\n".format(
+                        self.__input_source[i],
+                        self.__short_ema,
+                        self.__long_ema,
+                        signal.value if signal is not None else 0,
+                    ))
 
     def __initialize__(self):
         if len(self.__input_source) < 2 * self.__long_period:
