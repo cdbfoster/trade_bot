@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.indicator import Signal as _Signal
+from trade.indicator import Signal
 from trade.investor import _Investor
 
 class SingleIndicatorInvestor(_Investor):
@@ -27,14 +27,14 @@ class SingleIndicatorInvestor(_Investor):
     def tick(self):
         signal = self.indicator.get_signal()
 
-        if signal is None or signal == _Signal.HOLD:
+        if signal is None or signal == Signal.HOLD:
             return
 
-        if signal == _Signal.SELL and self.market.balance[self.market.exchange_currency] > 0:
+        if signal == Signal.SELL and self.market.balance[self.market.exchange_currency] > 0:
             amount = self.market.balance[self.market.exchange_currency] * self.trade_percent
             self.market.sell(self.market.exchange_currency, amount)
             self.position -= 1
-        elif signal == _Signal.BUY and self.market.balance[self.market.base_currency] > 0:
+        elif signal == Signal.BUY and self.market.balance[self.market.base_currency] > 0:
             amount = self.market.balance[self.market.base_currency] * self.trade_percent
             self.market.buy(self.market.exchange_currency, amount)
             self.position += 1
