@@ -43,10 +43,11 @@ class MACDSignalCrossoverIndicator(_Indicator):
 
         macd_hist = self.__short_ema - self.__long_ema - self.__signal_ema
         if math.copysign(1, macd_hist) != math.copysign(1, self.__old_macd_hist):
-            if self.__signal_ema < 0:
-                return Signal.BUY if macd_hist >= 0 else Signal.HOLD
-            else:
-                return Signal.SELL if macd_hist < 0 else Signal.HOLD
+            return Signal.BUY if macd_hist >= 0 else Signal.SELL
+            #if self.__signal_ema < 0:
+            #    return Signal.BUY if macd_hist >= 0 else Signal.HOLD
+            #else:
+            #    return Signal.SELL if macd_hist < 0 else Signal.HOLD
         return Signal.HOLD
 
     def update(self, steps=1):
