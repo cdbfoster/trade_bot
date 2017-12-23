@@ -19,7 +19,7 @@ import numpy as np
 from trade.indicator import _Indicator, Signal
 
 class MACDSignalCrossoverIndicator(_Indicator):
-    def __init__(self, input_source, short_period, long_period, signal_period,debug=None):
+    def __init__(self, input_source, short_period=320, long_period=720, signal_period=250, debug=None):
         self.__input_source = input_source
         self.__short_period = short_period
         self.__long_period = long_period
