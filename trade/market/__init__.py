@@ -13,6 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
+from enum import auto, Enum
+
+class OrderSide(Enum):
+    BUY = auto()
+    SELL = auto()
+
+class OrderType(Enum):
+    LIMIT = auto()
+    IMMEDIATE = auto()
+    MARKET = auto()
+
 class _Market:
     def __init__(self, exchange_currency, base_currency):
         self.exchange_currency = exchange_currency
@@ -25,10 +36,16 @@ class _Market:
             base_currency: 0.0,
         }
 
-    def buy(self, currency, other_amount):
+    def place_order(self, order_side, order_type, amount, cancel_existing=True):
         pass
 
-    def sell(self, currency, amount):
+    def cancel_active_orders(self):
+        pass
+
+    def get_last_price(self):
+        pass
+
+    def get_portfolio_value(self):
         pass
 
 from ._historical_market import HistoricalMarket

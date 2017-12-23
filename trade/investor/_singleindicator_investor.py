@@ -15,6 +15,7 @@
 
 from trade.indicator import Signal
 from trade.investor import _Investor
+from trade.market import OrderSide, OrderType
 
 class SingleIndicatorInvestor(_Investor):
     def __init__(self, market, indicator, trade_percent=1.0, maximum_trade=None, exchange_amount=None, base_amount=None):
@@ -35,12 +36,12 @@ class SingleIndicatorInvestor(_Investor):
             amount = self.market.balance[self.market.exchange_currency] * self.trade_percent
             if self.maximum_trade is not None:
                 amount = min(amount, self.maximum_trade)
-            self.market.sell(self.market.exchange_currency, amount)
+            self.market.place_order(OrderSide.SELL, OrderType.MARKET, amount)
             self.position -= 1
         elif signal == Signal.BUY and self.market.balance[self.market.base_currency] > 0:
             amount = self.market.balance[self.market.base_currency] * self.trade_percent
             if self.maximum_trade is not None:
-                maximum = self.market[-1] * self.maximum_trade
+                maximum = self.market.get_last_price() * self.maximum_trade
                 amount = min(amount, maximum)
-            self.market.buy(self.market.exchange_currency, amount)
+            self.market.place_order(OrderSide.BUY, OrderType.MARKET, amount)
             self.position += 1

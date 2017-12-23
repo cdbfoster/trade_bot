@@ -14,33 +14,45 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 from trade.inputsource import HistoricalInputSource
-from trade.market import _Market
+from trade.market import _Market, OrderSide, OrderType
 
 class HistoricalMarket(_Market, HistoricalInputSource):
     def __init__(self, exchange_currency, base_currency, filename, start=None, position=None, reverse=False):
         _Market.__init__(self, exchange_currency, base_currency)
         HistoricalInputSource.__init__(self, filename, start, position, reverse)
 
-    def buy(self, currency, other_amount):
-        other = self.exchange_currency if currency == self.base_currency else self.base_currency
-        rate = 1 / self[-1] if currency == self.exchange_currency else self[-1]
+    def place_order(self, order_side, order_type, amount, cancel_existing=True):
+        exchange_amount = None
+        base_amount = None
 
-        amount = other_amount * rate
-        if self.balance[other] < other_amount:
+        if order_side == OrderSide.BUY:
+            exchange_amount = amount / self.get_last_price()
+            base_amount = amount
+        elif order_side == OrderSide.SELL:
+            exchange_amount = amount
+            base_amount = amount * self.get_last_price()
+        else:
+            raise ValueError("invalid order side")
+
+        if order_type != OrderType.MARKET:
+            raise ValueError("HistoricalMarket only accepts market orders")
+
+        if order_side == OrderSide.BUY and self.balance[self.base_currency] >= base_amount:
+            self.balance[self.base_currency] -= base_amount
+            self.balance[self.exchange_currency] += exchange_amount
+            return True
+        elif order_side == OrderSide.SELL and self.balance[self.exchange_currency] >= exchange_amount:
+            self.balance[self.exchange_currency] -= exchange_amount
+            self.balance[self.base_currency] += base_amount
+            return True
+        else:
             return False
 
-        self.balance[other] -= other_amount
-        self.balance[currency] += amount
-        return True
+    def cancel_existing_orders(self):
+        pass
 
-    def sell(self, currency, amount):
-        other = self.exchange_currency if currency == self.base_currency else self.base_currency
-        rate = self[-1] if currency == self.exchange_currency else 1 / self[-1]
+    def get_last_price(self):
+        return self[-1] if len(self) > 0 else None
 
-        if self.balance[currency] < amount:
-            return False
-
-        other_amount = amount * rate
-        self.balance[other] += other_amount
-        self.balance[currency] -= amount
-        return True
+    def get_portfolio_value(self):
+        return self.get_last_price() * self.balance[self.exchange_currency] + self.balance[self.base_currency]
