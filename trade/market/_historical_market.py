@@ -17,20 +17,22 @@ from trade.inputsource import HistoricalInputSource
 from trade.market import _Market, OrderSide, OrderType
 
 class HistoricalMarket(_Market, HistoricalInputSource):
-    def __init__(self, exchange_currency, base_currency, filename, start=None, position=None, reverse=False):
+    def __init__(self, exchange_currency, base_currency, filename, trade_loss=0.001, start=None, position=None, reverse=False):
         _Market.__init__(self, exchange_currency, base_currency)
         HistoricalInputSource.__init__(self, filename, start, position, reverse)
+
+        self.__trade_loss = trade_loss
 
     def place_order(self, order_side, order_type, amount, cancel_existing=True):
         exchange_amount = None
         base_amount = None
 
         if order_side == OrderSide.BUY:
-            exchange_amount = amount / self.get_last_price()
+            exchange_amount = amount / (self.get_last_price() * (1 + self.__trade_loss))
             base_amount = amount
         elif order_side == OrderSide.SELL:
             exchange_amount = amount
-            base_amount = amount * self.get_last_price()
+            base_amount = amount * (self.get_last_price() * (1 - self.__trade_loss))
         else:
             raise ValueError("invalid order side")
 
