@@ -17,7 +17,7 @@ import numpy as np
 
 from trade.indicator import _Indicator, Signal
 
-class EMACrossoverIndicator(_Indicator):
+class EmaCrossoverIndicator(_Indicator):
     def __init__(self, input_source, short_period, long_period, debug=None):
         self.__input_source = input_source
         self.__short_period = short_period
