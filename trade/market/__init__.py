@@ -48,4 +48,5 @@ class _Market:
     def get_portfolio_value(self):
         pass
 
+from ._gemini_market import GeminiMarket
 from ._historical_market import HistoricalMarket
