@@ -14,3 +14,4 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 from ._tradebenchmarker import TradeBenchmarker
+from ._websocketclient import WebSocketClient
