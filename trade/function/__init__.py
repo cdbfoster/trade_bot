@@ -25,8 +25,22 @@ class _Function:
 
     def save(self, filename, mode='w'):
         f = open(filename, mode)
-        for x in self[:]:
+        for x in self:
             f.write("{}\n".format(x))
         f.close()
+
+    def __iter__(self):
+        return _Function.__Iter(self)
+
+    class __Iter:
+        def __init__(self, function):
+            self.function = function
+            self.position = 0
+
+        def __next__(self):
+            if self.position < len(self.function):
+                self.position += 1
+                return self.function[self.position - 1]
+            raise StopIteration
 
 from ._historicalinput_function import HistoricalInputFunction
