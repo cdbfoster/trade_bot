@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.inputsource import _InputSource
+from trade.function import _Function
 
-class HistoricalInputSource(_InputSource):
+class HistoricalInputFunction(_Function):
     def __init__(self, filename, start=None, position=None, reverse=False):
         self.__prices = list(float(line.strip()) for line in open(filename))
         if reverse:

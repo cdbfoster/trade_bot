@@ -16,11 +16,11 @@
 from enum import Enum
 import json
 
-from trade.inputsource import _InputSource
+from trade.function import _Function
 from trade.market import _Market, OrderSide, OrderType
 from trade.util import WebSocketClient
 
-class GeminiMarket(_InputSource, _Market):
+class GeminiMarket(_Function, _Market):
     class Symbol(Enum):
         BTCUSD = "btcusd"
         ETHUSD = "ethusd"

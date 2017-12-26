@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-class _InputSource:
+class _Function:
     def __getitem__(self, value):
         pass
 
@@ -29,4 +29,4 @@ class _InputSource:
             f.write("{}\n".format(x))
         f.close()
 
-from ._historical_inputsource import HistoricalInputSource
+from ._historicalinput_function import HistoricalInputFunction
