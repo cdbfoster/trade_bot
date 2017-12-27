@@ -14,7 +14,7 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 class _Function:
-    def __getitem__(self, value):
+    def __getitem__(self, index):
         pass
 
     def __len__(self):

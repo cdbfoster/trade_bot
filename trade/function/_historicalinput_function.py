@@ -31,16 +31,16 @@ class HistoricalInputFunction(_Function):
         if position is not None:
             self.position = self.__actual_position(position)
 
-    def __getitem__(self, value):
-        if isinstance(value, int):
-            position = self.__actual_position(value)
+    def __getitem__(self, index):
+        if isinstance(index, int):
+            position = self.__actual_position(index)
             if position >= self.position or position < 0:
                 raise IndexError
             return self.__prices[position + self.start]
-        elif isinstance(value, slice):
-            start = min(max(self.__actual_position(value.start) if value.start is not None else 0, 0), self.position - 1) + self.start
-            stop = min(max(self.__actual_position(value.stop) if value.stop is not None else self.position, 0), self.position) + self.start
-            step = value.step
+        elif isinstance(index, slice):
+            start = min(max(self.__actual_position(index.start) if index.start is not None else 0, 0), self.position - 1) + self.start
+            stop = min(max(self.__actual_position(index.stop) if index.stop is not None else self.position, 0), self.position) + self.start
+            step = index.step
             return self.__prices[start:stop:step]
         else:
             raise TypeError
