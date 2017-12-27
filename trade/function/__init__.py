@@ -45,3 +45,5 @@ class _Function:
 
 from ._ema_function import EmaFunction
 from ._historicalinput_function import HistoricalInputFunction
+from ._macd_function import MacdFunction
+from ._macdhistogram_function import MacdHistogramFunction
