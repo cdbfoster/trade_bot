@@ -43,4 +43,5 @@ class _Function:
                 return self.function[self.position - 1]
             raise StopIteration
 
+from ._ema_function import EmaFunction
 from ._historicalinput_function import HistoricalInputFunction
