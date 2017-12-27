@@ -20,7 +20,7 @@ class _Function:
     def __len__(self):
         pass
 
-    def update(self, steps=1):
+    def update(self, steps=1, update_input=True):
         pass
 
     def save(self, filename, mode='w'):

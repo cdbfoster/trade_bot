@@ -48,7 +48,7 @@ class HistoricalInputFunction(_Function):
     def __len__(self):
         return self.position
 
-    def update(self, steps=1):
+    def update(self, steps=1, update_input=True):
         self.position = None if self.position is None else self.position + 1
 
     def total_len(self):
