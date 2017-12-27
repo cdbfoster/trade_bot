@@ -23,10 +23,12 @@ class _Function:
     def update(self, steps=1, update_input=True):
         pass
 
-    def save(self, filename, mode='w'):
+    def save(self, filename, mode='w', save_input=False):
         f = open(filename, mode)
-        for x in self:
-            f.write("{}\n".format(x))
+        for i in range(-len(self), 0):
+            if save_input and 'input' in dir(self):
+                f.write("{} ".format(self.input[i]))
+            f.write("{}\n".format(self[i]))
         f.close()
 
     def __iter__(self):

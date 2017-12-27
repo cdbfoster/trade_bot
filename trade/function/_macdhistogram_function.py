@@ -17,7 +17,7 @@ from trade.function import _Function, EmaFunction, MacdFunction
 
 class MacdHistogramFunction(_Function):
     def __init__(self, input_, short_period, long_period, signal_period):
-        self.__input = input_
+        self.input = input_
 
         self.__macd = MacdFunction(input_, short_period=short_period, long_period=long_period)
         self.__macd_signal = EmaFunction(self.__macd, period=signal_period)
@@ -33,7 +33,7 @@ class MacdHistogramFunction(_Function):
 
     def update(self, steps=1, update_input=True):
         if update_input:
-            self.__input.update(steps)
+            self.input.update(steps)
 
         self.__macd.update(steps, update_input=False)
         self.__macd_signal.update(steps, update_input=False)

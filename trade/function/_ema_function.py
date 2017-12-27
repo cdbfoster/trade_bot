@@ -19,7 +19,7 @@ from trade.function import _Function
 
 class EmaFunction(_Function):
     def __init__(self, input_, period):
-        self.__input = input_
+        self.input = input_
         self.__period = period
 
         self.__weight = 2 / (self.__period + 1)
@@ -35,25 +35,25 @@ class EmaFunction(_Function):
 
     def update(self, steps=1, update_input=True):
         if update_input:
-            self.__input.update(steps)
+            self.input.update(steps)
 
         if len(self.__values) == 0:
             self.__initialize()
         else:
             for i in range(-steps, 0):
-                self.__values.append(self.__update_ema(self.__input[i], self.__values[-1]))
+                self.__values.append(self.__update_ema(self.input[i], self.__values[-1]))
 
     def __initialize(self):
-        if len(self.__input) < 2 * self.__period:
+        if len(self.input) < 2 * self.__period:
             return
 
-        ema = np.mean(self.__input[:self.__period])
-        for x in self.__input[self.__period:2 * self.__period]:
+        ema = np.mean(self.input[:self.__period])
+        for x in self.input[self.__period:2 * self.__period]:
             ema = self.__update_ema(x, ema)
 
         self.__values.append(ema)
-        for i in range(2 * self.__period, len(self.__input)):
-            self.__values.append(self.__update_ema(self.__input[i], self.__values[-1]))
+        for i in range(2 * self.__period, len(self.input)):
+            self.__values.append(self.__update_ema(self.input[i], self.__values[-1]))
 
     def __update_ema(self, value, current):
         return (value - current) * self.__weight + current

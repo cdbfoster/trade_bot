@@ -20,7 +20,7 @@ class MacdFunction(_Function):
         if short_period >= long_period:
             raise ValueError("short_period must be less than long_period")
 
-        self.__input = input_
+        self.input = input_
 
         self.__short = EmaFunction(input_, period=short_period)
         self.__long = EmaFunction(input_, period=long_period)
@@ -36,7 +36,7 @@ class MacdFunction(_Function):
 
     def update(self, steps=1, update_input=True):
         if update_input:
-            self.__input.update(steps)
+            self.input.update(steps)
 
         self.__short.update(steps, update_input=False)
         self.__long.update(steps, update_input=False)
