@@ -25,31 +25,16 @@ class MacdFunction(_Function):
         self.__short = EmaFunction(input_, period=short_period)
         self.__long = EmaFunction(input_, period=long_period)
 
-        self.__values = []
-        self.__initialize()
-
-    def __getitem__(self, index):
-        return self.__values[index]
-
     def __len__(self):
-        return len(self.__values)
+        return len(self.__long)
 
-    def update(self, steps=1, update_input=True):
-        if update_input:
-            self.input.update(steps)
+    def _calculate_values(self, count):
+        count = min(count, len(self))
+        if count <= 0:
+            return []
 
-        self.__short.update(steps, update_input=False)
-        self.__long.update(steps, update_input=False)
+        start = -len(self)
+        short = self.__short[start:start + count if start + count < 0 else None]
+        long_ = self.__long[start:start + count if start + count < 0 else None]
 
-        if len(self.__values) == 0:
-            self.__initialize()
-        else:
-            for i in range(-steps, 0):
-                self.__values.append(self.__short[i] - self.__long[i])
-
-    def __initialize(self):
-        if len(self.__long) == 0:
-            return
-
-        for i in range(-len(self.__long), 0):
-            self.__values.append(self.__short[i] - self.__long[i])
+        return list(s - l for s, l in zip(short, long_))

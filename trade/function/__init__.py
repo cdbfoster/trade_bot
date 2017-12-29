@@ -14,21 +14,28 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 class _Function:
-    def __getitem__(self, index):
-        pass
-
     def __len__(self):
-        pass
+        return len(self._get_range())
 
-    def update(self, steps=1, update_input=True):
-        pass
+    def __getitem__(self, index):
+        if isinstance(index, int):
+            if index >= len(self) or index < -len(self):
+                raise ValueError("function index out of range")
+            if index < 0:
+                index += len(self)
+            return self._calculate_values(index + 1)[-1]
+        elif isinstance(index, slice):
+            return self._calculate_values(len(self))[index]
+        else:
+            raise TypeError("function indices must be integers or slices")
 
     def save(self, filename, mode='w', save_input=False):
         f = open(filename, mode)
-        for i in range(-len(self), 0):
-            if save_input and 'input' in dir(self):
-                f.write("{} ".format(self.input[i]))
-            f.write("{}\n".format(self[i]))
+        input_ = self.input[-len(self):] if save_input and 'input' in dir(self) else None
+        for i, x in enumerate(self):
+            if input_ is not None:
+                f.write("{} ".format(input_[i]))
+            f.write("{}\n".format(x))
         f.close()
 
     def __iter__(self):

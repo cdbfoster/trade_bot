@@ -21,39 +21,25 @@ class EmaFunction(_Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
-
         self.__weight = 2 / (self.__period + 1)
 
-        self.__values = []
-        self.__initialize()
-
-    def __getitem__(self, index):
-        return self.__values[index]
-
     def __len__(self):
-        return len(self.__values)
+        return max(len(self.input) - 2 * self.__period + 1, 0)
 
-    def update(self, steps=1, update_input=True):
-        if update_input:
-            self.input.update(steps)
+    def _calculate_values(self, count):
+        count = min(count, len(self))
+        if count <= 0:
+            return []
 
-        if len(self.__values) == 0:
-            self.__initialize()
-        else:
-            for i in range(-steps, 0):
-                self.__values.append(self.__update_ema(self.input[i], self.__values[-1]))
+        input_ = self.input[:2 * self.__period + count - 1]
 
-    def __initialize(self):
-        if len(self.input) < 2 * self.__period:
-            return
+        ema = np.mean(input_[:self.__period])
+        for i in range(self.__period, 2 * self.__period - 1):
+            ema = (input_[i] - ema) * self.__weight + ema
 
-        ema = np.mean(self.input[:self.__period])
-        for x in self.input[self.__period:2 * self.__period]:
-            ema = self.__update_ema(x, ema)
+        values = []
+        for i in range(2 * self.__period - 1, 2 * self.__period + count - 1):
+            ema = (input_[i] - ema) * self.__weight + ema
+            values.append(ema)
 
-        self.__values.append(ema)
-        for i in range(2 * self.__period, len(self.input)):
-            self.__values.append(self.__update_ema(self.input[i], self.__values[-1]))
-
-    def __update_ema(self, value, current):
-        return (value - current) * self.__weight + current
+        return values

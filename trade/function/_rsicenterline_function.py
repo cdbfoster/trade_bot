@@ -24,46 +24,28 @@ class RsiCenterlineFunction(_Function):
 
         self.__difference = DifferenceFunction(input_)
 
-        self.__average_gain = None
-        self.__average_loss = None
-
-        self.__values = []
-        self.__initialize()
-
-    def __getitem__(self, index):
-        return self.__values[index]
-
     def __len__(self):
-        return len(self.__values)
+        return max(len(self.__difference) - 2 * self.__period + 1, 0)
 
-    def update(self, steps=1, update_input=True):
-        if update_input:
-            self.input.update(steps)
+    def _calculate_values(self, count):
+        count = min(count, len(self))
+        if count <= 0:
+            return []
 
-        self.__difference.update(steps, update_input=False)
+        input_ = self.input[1:2 * self.__period + count]
+        difference = self.__difference[:2 * self.__period + count - 1]
 
-        if len(self.__values) == 0:
-            self.__initialize()
-        else:
-            for i in range(-steps, 0):
-                self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__difference[i], 0)) / self.__period
-                self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__difference[i], 0)) / self.__period
-                self.__values.append(self.input[i + 1] + (-1 * self.__average_gain - self.__average_loss) * (self.__period - 1))
+        average_gain = np.mean([max(difference[i], 0) for i in range(self.__period)])
+        average_loss = np.mean([min(difference[i], 0) for i in range(self.__period)])
 
-    def __initialize(self):
-        if len(self.__difference) < 2 * self.__period:
-            return
+        for i in range(self.__period, 2 * self.__period - 1):
+            average_gain = (average_gain * (self.__period - 1) + max(difference[i], 0)) / self.__period
+            average_loss = (average_loss * (self.__period - 1) + min(difference[i], 0)) / self.__period
 
-        self.__average_gain = np.mean([max(self.__difference[i], 0) for i in range(self.__period)])
-        self.__average_loss = np.mean([min(self.__difference[i], 0) for i in range(self.__period)])
+        values = []
+        for i in range(2 * self.__period - 1, 2 * self.__period + count - 1):
+            average_gain = (average_gain * (self.__period - 1) + max(difference[i], 0)) / self.__period
+            average_loss = (average_loss * (self.__period - 1) + min(difference[i], 0)) / self.__period
+            values.append(input_[i] + (-average_gain - average_loss) * (self.__period - 1))
 
-        for i in range(self.__period, 2 * self.__period):
-            self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__difference[i], 0)) / self.__period
-            self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__difference[i], 0)) / self.__period
-
-        self.__values.append(self.input[2 * self.__period] + (-1 * self.__average_gain - self.__average_loss) * (self.__period - 1))
-
-        for i in range(2 * self.__period, len(self.__difference)):
-            self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__difference[i], 0)) / self.__period
-            self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__difference[i], 0)) / self.__period
-            self.__values.append(self.input[i + 1] + (-1 * self.__average_gain - self.__average_loss) * (self.__period - 1))
+        return values

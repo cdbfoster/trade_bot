@@ -22,31 +22,16 @@ class MacdHistogramFunction(_Function):
         self.__macd = MacdFunction(input_, short_period=short_period, long_period=long_period)
         self.__macd_signal = EmaFunction(self.__macd, period=signal_period)
 
-        self.__values = []
-        self.__initialize()
-
-    def __getitem__(self, index):
-        return self.__values[index]
-
     def __len__(self):
-        return len(self.__values)
+        return len(self.__macd_signal)
 
-    def update(self, steps=1, update_input=True):
-        if update_input:
-            self.input.update(steps)
+    def _calculate_values(self, count):
+        count = min(count, len(self))
+        if count <= 0:
+            return []
 
-        self.__macd.update(steps, update_input=False)
-        self.__macd_signal.update(steps, update_input=False)
+        start = -len(self)
+        macd = self.__macd[start:start + count if start + count < 0 else None]
+        macd_signal = self.__macd_signal[start:start + count if start + count < 0 else None]
 
-        if len(self.__values) == 0:
-            self.__initialize()
-        else:
-            for i in range(-steps, 0):
-                self.__values.append(self.__macd[i] - self.__macd_signal[i])
-
-    def __initialize(self):
-        if len(self.__macd_signal) == 0:
-            return
-
-        for i in range(-len(self.__macd_signal), 0):
-            self.__values.append(self.__macd[i] - self.__macd_signal[i])
+        return list(m - s for m, s in zip(macd, macd_signal))

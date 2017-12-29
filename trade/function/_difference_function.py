@@ -19,28 +19,14 @@ class DifferenceFunction(_Function):
     def __init__(self, input_):
         self.input = input_
 
-        self.__values = []
-        self.__initialize()
-
-    def __getitem__(self, index):
-        return self.__values[index]
-
     def __len__(self):
-        return len(self.__values)
+        return max(len(self.input) - 1, 0)
 
-    def update(self, steps=1, update_input=True):
-        if update_input:
-            self.input.update(steps)
+    def _calculate_values(self, count):
+        count = min(count, len(self))
+        if count <= 0:
+            return []
 
-        if len(self.__values) == 0:
-            self.__initialize()
-        else:
-            for i in range(-steps, 0):
-                self.__values.append(self.input[i] - self.input[i - 1])
+        input_ = self.input[:count + 1]
 
-    def __initialize(self):
-        if len(self.input) < 2:
-            return
-
-        for i in range(len(self.input) - 1):
-            self.__values.append(self.input[i + 1] - self.input[i])
+        return list(input_[i + 1] - input_[i] for i in range(count))
