@@ -43,15 +43,16 @@ class _Function:
 
     class __Iter:
         def __init__(self, function):
-            self.function = function
+            self.values = function[:]
             self.position = 0
 
         def __next__(self):
-            if self.position < len(self.function):
+            if self.position < len(self.values):
                 self.position += 1
-                return self.function[self.position - 1]
+                return self.values[self.position - 1]
             raise StopIteration
 
+from ._aroon_functions import AroonUpFunction, AroonDownFunction, AroonOscillatorFunction
 from ._difference_function import DifferenceFunction
 from ._ema_function import EmaFunction
 from ._historicalinput_function import HistoricalInputFunction

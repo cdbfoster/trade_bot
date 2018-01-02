@@ -28,6 +28,7 @@ class _Indicator:
     def update(self, steps=1):
         pass
 
+from ._aroonoscillator_indicator import AroonOscillatorIndicator
 from ._emacrossover_indicator import EmaCrossoverIndicator
 from ._macdsignalcrossover_indicator import MacdSignalCrossoverIndicator
 from ._rsi_indicator import RsiIndicator
