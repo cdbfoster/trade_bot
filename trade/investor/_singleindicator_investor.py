@@ -18,8 +18,10 @@ from trade.investor import _Investor
 from trade.market import OrderSide, OrderType
 
 class SingleIndicatorInvestor(_Investor):
-    def __init__(self, market, indicator, maximum_trade=None, disable=0.0125, maximum_campaigns=1, exchange_amount=None, base_amount=None):
+    def __init__(self, market, indicator, maximum_trade=None, disable=0.0125, maximum_campaigns=1, exchange_amount=None, base_amount=None, debug=None):
         _Investor.__init__(self, market, exchange_amount, base_amount)
+
+        self.debug = debug
 
         self.indicator = indicator
         self.maximum_trade = maximum_trade
@@ -45,7 +47,11 @@ class SingleIndicatorInvestor(_Investor):
 
             if max_[1] > 0 or len(self.campaigns) == self.maximum_campaigns:
                 campaign = self.campaigns.pop(max_[0])
+                old_balance = self.market.balance.copy()
                 self.market.place_order(OrderSide.SELL, OrderType.MARKET, campaign[1])
+
+                if self.debug is not None:
+                    self.debug.write("SELL - Price: {:.2f}, Before: {}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, self.market.balance, self.market.get_portfolio_value()))
 
         elif signal == Signal.BUY and self.market.balance[self.market.base_currency] > 0 and len(self.campaigns) < self.maximum_campaigns:
             if self.last_signal != Signal.BUY:
@@ -54,8 +60,11 @@ class SingleIndicatorInvestor(_Investor):
                 if self.maximum_trade is not None:
                     investment = min(investment, self.maximum_trade * last_price)
 
-                old_amount = self.market.balance[self.market.exchange_currency]
+                old_balance = self.market.balance.copy()
                 self.market.place_order(OrderSide.BUY, OrderType.MARKET, investment)
-                self.campaigns.append((last_price, self.market.balance[self.market.exchange_currency] - old_amount))
+                self.campaigns.append((last_price, self.market.balance[self.market.exchange_currency] - old_balance[self.market.exchange_currency]))
+
+                if self.debug is not None:
+                    self.debug.write("BUY - Price: {:.2f}, Before: {}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, self.market.balance, self.market.get_portfolio_value()))
 
         self.last_signal = signal
