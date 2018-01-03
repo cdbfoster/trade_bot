@@ -46,7 +46,24 @@ class _Market:
         pass
 
     def get_portfolio_value(self):
+        return self.get_last_price() * self.balance[self.exchange_currency] + self.balance[self.base_currency]
+
+    def get_orders(self, side):
         pass
+
+    def get_orders_by_count(self, side, count):
+        orders = self.get_orders(side)
+        return orders[:count] if orders is not None else None
+
+    def get_orders_by_volume(self, side, volume):
+        orders = self.get_orders(side)
+        if orders is not None:
+            current_volume = 0
+            for i in range(len(orders)):
+                current_volume += orders[i][1]
+                if current_volume >= volume:
+                    return orders[:i + 1]
+        return orders
 
 from ._gemini_market import GeminiMarket
 from ._historical_market import HistoricalMarket

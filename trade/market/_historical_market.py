@@ -17,22 +17,23 @@ from trade.function import HistoricalInputFunction
 from trade.market import _Market, OrderSide, OrderType
 
 class HistoricalMarket(_Market, HistoricalInputFunction):
-    def __init__(self, exchange_currency, base_currency, filename, trade_loss=0.001, start=None, position=None, reverse=False):
+    def __init__(self, exchange_currency, base_currency, filename, trade_loss=0.001, transaction_fee=0.0025, start=None, position=None, reverse=False):
         _Market.__init__(self, exchange_currency, base_currency)
         HistoricalInputFunction.__init__(self, filename, start, position, reverse)
 
         self.__trade_loss = trade_loss
+        self.__transaction_fee = transaction_fee
 
     def place_order(self, order_side, order_type, amount, cancel_existing=True):
         exchange_amount = None
         base_amount = None
 
         if order_side == OrderSide.BUY:
-            exchange_amount = amount / (self.get_last_price() * (1 + self.__trade_loss))
+            exchange_amount = amount * (1 - self.__transaction_fee) / (self.get_last_price() * (1 + self.__trade_loss))
             base_amount = amount
         elif order_side == OrderSide.SELL:
             exchange_amount = amount
-            base_amount = amount * (self.get_last_price() * (1 - self.__trade_loss))
+            base_amount = amount * (self.get_last_price() * (1 - self.__trade_loss)) * (1 - self.__transaction_fee)
         else:
             raise ValueError("invalid order side")
 
@@ -55,6 +56,3 @@ class HistoricalMarket(_Market, HistoricalInputFunction):
 
     def get_last_price(self):
         return self[-1] if len(self) > 0 else None
-
-    def get_portfolio_value(self):
-        return self.get_last_price() * self.balance[self.exchange_currency] + self.balance[self.base_currency]
