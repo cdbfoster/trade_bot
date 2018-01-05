@@ -38,7 +38,7 @@ class AroonOscillatorIndicator(_Indicator):
         ao = self.__aroon_oscillator[-2:]
 
         if math.copysign(1, ao[-2]) != math.copysign(1, ao[-1]):
-            return self.__last_spike if self.__last_spike is not None else Signal.HOLD
+            return self.__last_spike if self.__last_spike is not None and self.__last_spike.value == math.copysign(1, ao[-1]) else Signal.HOLD
 
         return Signal.HOLD
 
@@ -54,7 +54,8 @@ class AroonOscillatorIndicator(_Indicator):
                 self.__last_spike = Signal.BUY if a < 0 else Signal.SELL
 
             if self.debug is not None and len(ao) > steps:
-                signal = self.__last_spike if math.copysign(1, ao[i - 1]) != math.copysign(1, ao[i]) else None
+                signal = self.__last_spike if math.copysign(1, ao[i - 1]) != math.copysign(1, ao[i]) and \
+                    self.__last_spike is not None and self.__last_spike.value == math.copysign(1, ao[i]) else None
                 self.debug.write("{} {} {}\n".format(
                     input_[i],
                     ao[i],
