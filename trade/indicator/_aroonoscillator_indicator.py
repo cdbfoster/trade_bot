@@ -50,6 +50,7 @@ class AroonOscillatorIndicator(_Indicator):
             return
 
         for i, a in enumerate(ao[1:]):
+            i += 1
             if abs(a) >= self.__threshold:
                 self.__last_spike = Signal.BUY if a < 0 else Signal.SELL
 
