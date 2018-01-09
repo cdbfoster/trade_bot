@@ -41,6 +41,9 @@ class WebSocketClient:
         self.closed = True
         self.__ws.close()
 
+    def wait(self):
+        self.__input_thread.join()
+
     def on_open(self, ws):
         pass
 
