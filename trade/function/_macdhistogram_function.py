@@ -13,16 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import _Function, EmaFunction, MacdFunction
+from trade.function import Function, EmaFunction, MacdFunction
 
-class MacdHistogramFunction(_Function):
+class MacdHistogramFunction(Function):
     def __init__(self, input_, short_period, long_period, signal_period):
         self.input = input_
 
         self.__macd = MacdFunction(input_, short_period=short_period, long_period=long_period)
         self.__macd_signal = EmaFunction(self.__macd, period=signal_period)
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()

@@ -15,9 +15,9 @@
 
 import numpy as np
 
-from trade.function import _Function, DifferenceFunction
+from trade.function import Function, DifferenceFunction
 
-class RsiFunction(_Function):
+class RsiFunction(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
@@ -26,7 +26,7 @@ class RsiFunction(_Function):
         self.__average_gain = None
         self.__average_loss = None
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         _ = self.__difference[-1:]

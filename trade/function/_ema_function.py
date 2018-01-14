@@ -15,15 +15,15 @@
 
 import numpy as np
 
-from trade.function import _Function
+from trade.function import Function
 
-class EmaFunction(_Function):
+class EmaFunction(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
         self.__weight = 2 / (self.__period + 1)
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         if len(self.input) < 2 * self.__period:

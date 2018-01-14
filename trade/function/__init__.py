@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-class _Function:
+class Function:
     def __init__(self):
         self._values = []
         self._exhaust_input()
@@ -75,7 +75,7 @@ class _Function:
         f.close()
 
     def __iter__(self):
-        return _Function.__Iter(self)
+        return Function.__Iter(self)
 
     class __Iter:
         def __init__(self, function):

@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import _Function
+from trade.function import Function
 
-class AroonUpFunction(_Function):
+class AroonUpFunction(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()
@@ -37,12 +37,12 @@ class AroonUpFunction(_Function):
 
         self._values.append((self.__period - high[1]) / self.__period)
 
-class AroonDownFunction(_Function):
+class AroonDownFunction(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()
@@ -59,7 +59,7 @@ class AroonDownFunction(_Function):
 
         self._values.append((self.__period - low[1]) / self.__period)
 
-class AroonOscillatorFunction(_Function):
+class AroonOscillatorFunction(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
@@ -67,7 +67,7 @@ class AroonOscillatorFunction(_Function):
         self.__up = AroonUpFunction(self.input, self.__period)
         self.__down = AroonDownFunction(self.input, self.__period)
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()

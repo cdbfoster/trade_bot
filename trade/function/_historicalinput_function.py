@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import _Function
+from trade.function import Function
 
-class HistoricalInputFunction(_Function):
+class HistoricalInputFunction(Function):
     def __init__(self, filename, start=None, position=None, reverse=False):
         self.__prices = list(float(line.strip()) for line in open(filename))
 
@@ -26,7 +26,7 @@ class HistoricalInputFunction(_Function):
 
         self.__position = position if position is not None else max(len(self.__prices) - 1, 0)
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()

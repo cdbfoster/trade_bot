@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import _Function, EmaFunction
+from trade.function import Function, EmaFunction
 
-class MacdFunction(_Function):
+class MacdFunction(Function):
     def __init__(self, input_, short_period, long_period):
         if short_period >= long_period:
             raise ValueError("short_period must be less than long_period")
@@ -25,7 +25,7 @@ class MacdFunction(_Function):
         self.__short = EmaFunction(input_, period=short_period)
         self.__long = EmaFunction(input_, period=long_period)
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()

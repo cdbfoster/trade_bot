@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import _Function
+from trade.function import Function
 
-class DifferenceFunction(_Function):
+class DifferenceFunction(Function):
     def __init__(self, input_):
         self.input = input_
 
-        _Function.__init__(self)
+        Function.__init__(self)
 
     def _first(self):
         self._next()
