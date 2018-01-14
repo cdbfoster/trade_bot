@@ -18,16 +18,19 @@ from trade.investor import _Investor
 from trade.market import OrderSide, OrderType
 
 class SingleIndicatorInvestor(_Investor):
-    def __init__(self, market, indicator, maximum_trade=None, disable=0.0125, maximum_campaigns=1, exchange_amount=None, base_amount=None, debug=None):
+    def __init__(self, market, indicator, maximum_trade=None, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_campaigns=1, exchange_amount=None, base_amount=None, debug=None):
         _Investor.__init__(self, market, exchange_amount, base_amount)
 
         self.debug = debug
 
         self.indicator = indicator
         self.maximum_trade = maximum_trade
-        self.disable = disable
+        self.sim_trade_loss = sim_trade_loss
+        self.sim_transaction_fee = sim_transaction_fee
         self.maximum_campaigns = maximum_campaigns
+
         self.last_signal = None
+        self.last_action_price = None
         self.campaigns = []
 
     def tick(self):
@@ -36,10 +39,10 @@ class SingleIndicatorInvestor(_Investor):
         if signal is None or signal == Signal.HOLD:
             return
 
-        if signal == Signal.SELL and self.market.balance[self.market.exchange_currency] > 0 and len(self.campaigns) > 0:
-            last_price = self.market.get_last_price()
+        last_price = self.market.get_last_price()
 
-            changes = [last_price * investment * (1 - self.disable) - price * investment for price, investment in self.campaigns]
+        if signal == Signal.SELL and self.market.balance[self.market.exchange_currency] > 0 and len(self.campaigns) > 0:
+            changes = [last_price * actual * (1 - self.sim_trade_loss) * (1 - self.sim_transaction_fee) - investment for investment, actual, _ in self.campaigns]
             max_ = None
             for i, change in enumerate(changes):
                 if max_ is not None and change > max_[1] or max_ is None:
@@ -48,23 +51,42 @@ class SingleIndicatorInvestor(_Investor):
             if max_[1] > 0 or len(self.campaigns) == self.maximum_campaigns:
                 campaign = self.campaigns.pop(max_[0])
                 old_balance = self.market.balance.copy()
+                old_value = self.market.get_portfolio_value()
                 self.market.place_order(OrderSide.SELL, OrderType.MARKET, campaign[1])
 
+                self.last_action_price = last_price
+
                 if self.debug is not None:
-                    self.debug.write("SELL - Price: {:.2f}, Before: {}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, self.market.balance, self.market.get_portfolio_value()))
+                    self.debug.write("SELL - Price: {:.2f}, Before: {}, Value: {:.2f}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, old_value, self.market.balance, self.market.get_portfolio_value()))
 
         elif signal == Signal.BUY and self.market.balance[self.market.base_currency] > 0 and len(self.campaigns) < self.maximum_campaigns:
-            if self.last_signal != Signal.BUY:
-                last_price = self.market.get_last_price()
+            top = max(last_price, self.last_action_price)  * (1 - self.sim_trade_loss) * (1 - self.sim_transaction_fee) if self.last_action_price is not None else None
+            bottom = min(last_price, self.last_action_price) * (1 + self.sim_trade_loss) / (1 - self.sim_transaction_fee) if self.last_action_price is not None else None
+
+            buy_allowed = top > bottom if self.last_action_price else True
+
+            if buy_allowed:
+                for campaign in self.campaigns:
+                    top = max(last_price, campaign[2])  * (1 - self.sim_trade_loss) * (1 - self.sim_transaction_fee)
+                    bottom = min(last_price, campaign[2]) * (1 + self.sim_trade_loss) / (1 - self.sim_transaction_fee)
+
+                    if top <= bottom:
+                        buy_allowed = False
+                        break
+
+            if buy_allowed:
                 investment = self.market.balance[self.market.base_currency] / (self.maximum_campaigns - len(self.campaigns))
                 if self.maximum_trade is not None:
                     investment = min(investment, self.maximum_trade * last_price)
 
                 old_balance = self.market.balance.copy()
+                old_value = self.market.get_portfolio_value()
                 self.market.place_order(OrderSide.BUY, OrderType.MARKET, investment)
-                self.campaigns.append((last_price, self.market.balance[self.market.exchange_currency] - old_balance[self.market.exchange_currency]))
+                self.campaigns.append((investment, self.market.balance[self.market.exchange_currency] - old_balance[self.market.exchange_currency], last_price))
+
+                self.last_action_price = last_price
 
                 if self.debug is not None:
-                    self.debug.write("BUY - Price: {:.2f}, Before: {}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, self.market.balance, self.market.get_portfolio_value()))
+                    self.debug.write("BUY - Price: {:.2f}, Before: {}, Value: {:.2f}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, old_value, self.market.balance, self.market.get_portfolio_value()))
 
         self.last_signal = signal
