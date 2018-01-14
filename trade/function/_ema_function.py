@@ -23,23 +23,21 @@ class EmaFunction(_Function):
         self.__period = period
         self.__weight = 2 / (self.__period + 1)
 
-    def __len__(self):
-        return max(len(self.input) - 2 * self.__period + 1, 0)
+        _Function.__init__(self)
 
-    def _calculate_values(self, count):
-        count = min(count, len(self))
-        if count <= 0:
-            return []
+    def _first(self):
+        if len(self.input) < 2 * self.__period:
+            raise StopIteration
 
-        input_ = self.input[:2 * self.__period + count - 1]
+        ema = np.mean(self.input[:self.__period])
+        for x in self.input[self.__period: 2 * self.__period - 1]:
+            ema = (x - ema) * self.__weight + ema
 
-        ema = np.mean(input_[:self.__period])
-        for i in range(self.__period, 2 * self.__period - 1):
-            ema = (input_[i] - ema) * self.__weight + ema
+        self._values.append((self.input[2 * self.__period - 1] - ema) * self.__weight + ema)
 
-        values = []
-        for i in range(2 * self.__period - 1, 2 * self.__period + count - 1):
-            ema = (input_[i] - ema) * self.__weight + ema
-            values.append(ema)
+    def _next(self):
+        input_index = len(self) + 2 * self.__period - 1
+        if input_index >= len(self.input):
+            raise StopIteration
 
-        return values
+        self._values.append((self.input[input_index] - self._values[-1]) * self.__weight + self._values[-1])

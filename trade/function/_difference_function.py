@@ -19,14 +19,14 @@ class DifferenceFunction(_Function):
     def __init__(self, input_):
         self.input = input_
 
-    def __len__(self):
-        return max(len(self.input) - 1, 0)
+        _Function.__init__(self)
 
-    def _calculate_values(self, count):
-        count = min(count, len(self))
-        if count <= 0:
-            return []
+    def _first(self):
+        self._next()
 
-        input_ = self.input[:count + 1]
+    def _next(self):
+        input_index = len(self) + 1
+        if input_index >= len(self.input):
+            raise StopIteration
 
-        return list(input_[i + 1] - input_[i] for i in range(count))
+        self._values.append(self.input[input_index] - self.input[input_index - 1])

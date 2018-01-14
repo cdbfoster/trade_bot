@@ -23,28 +23,34 @@ class RsiFunction(_Function):
         self.__period = period
 
         self.__difference = DifferenceFunction(input_)
+        self.__average_gain = None
+        self.__average_loss = None
 
-    def __len__(self):
-        return max(len(self.__difference) - 2 * self.__period + 1, 0)
+        _Function.__init__(self)
 
-    def _calculate_values(self, count):
-        count = min(count, len(self))
-        if count <= 0:
-            return []
+    def _first(self):
+        _ = self.__difference[-1:]
 
-        difference = self.__difference[:2 * self.__period + count - 1]
+        if len(self.__difference) < 2 * self.__period:
+            raise StopIteration
 
-        average_gain = np.mean([max(difference[i], 0) for i in range(self.__period)])
-        average_loss = np.mean([min(difference[i], 0) for i in range(self.__period)])
+        self.__average_gain = np.mean([max(d, 0) for d in self.__difference[:self.__period]])
+        self.__average_loss = np.mean([min(d, 0) for d in self.__difference[:self.__period]])
 
-        for i in range(self.__period, 2 * self.__period - 1):
-            average_gain = (average_gain * (self.__period - 1) + max(difference[i], 0)) / self.__period
-            average_loss = (average_loss * (self.__period - 1) + min(difference[i], 0)) / self.__period
+        for d in self.__difference[self.__period:2 * self.__period]:
+            self.__average_gain = (self.__average_gain * (self.__period - 1) + max(d, 0)) / self.__period
+            self.__average_loss = (self.__average_loss * (self.__period - 1) + min(d, 0)) / self.__period
 
-        values = []
-        for i in range(2 * self.__period - 1, 2 * self.__period + count - 1):
-            average_gain = (average_gain * (self.__period - 1) + max(difference[i], 0)) / self.__period
-            average_loss = (average_loss * (self.__period - 1) + min(difference[i], 0)) / self.__period
-            values.append(100 - 100 / (1 + average_gain / abs(average_loss)))
+        self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss)) # XXX We'll need some kind of zero division protection
 
-        return values
+    def _next(self):
+        self.__difference._exhaust_input()
+
+        input_index = len(self) + 2 * self.__period - 1
+        if input_index >= len(self.__difference):
+            raise StopIteration
+
+        self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__difference[input_index], 0)) / self.__period
+        self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__difference[input_index], 0)) / self.__period
+
+        self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss))

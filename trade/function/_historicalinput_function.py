@@ -18,47 +18,33 @@ from trade.function import _Function
 class HistoricalInputFunction(_Function):
     def __init__(self, filename, start=None, position=None, reverse=False):
         self.__prices = list(float(line.strip()) for line in open(filename))
+
         if reverse:
             self.__prices = self.__prices[::-1]
+        if start:
+            self.__prices = self.__prices[start:]
 
-        self.start = 0
+        self.__position = position if position is not None else max(len(self.__prices) - 1, 0)
 
-        if start is not None:
-            self.start = start if start >= 0 else len(self.__prices) + start
+        _Function.__init__(self)
 
-        self.position = len(self.__prices) - self.start
+    def _first(self):
+        self._next()
 
-        if position is not None:
-            self.position = self.__actual_position(position)
+    def _next(self):
+        if len(self) > self.__position or len(self.__prices) == 0:
+            raise StopIteration
 
-    def __getitem__(self, index):
-        if isinstance(index, int):
-            position = self.__actual_position(index)
-            if position >= self.position or position < 0:
-                raise IndexError
-            return self.__prices[position + self.start]
-        elif isinstance(index, slice):
-            start = min(max(self.__actual_position(index.start) if index.start is not None else 0, 0), self.position - 1) + self.start
-            stop = min(max(self.__actual_position(index.stop) if index.stop is not None else self.position, 0), self.position) + self.start
-            step = index.step
-            return self.__prices[start:stop:step]
-        else:
-            raise TypeError
+        self._values.append(self.__prices[len(self)])
 
-    def __len__(self):
-        return self.position
+    def update(self, steps=1):
+        self.__position = max(min(self.__position + steps, len(self.__prices) - 1), 0)
 
-    def update(self, steps=1, update_input=True):
-        self.position = None if self.position is None else self.position + 1
-
-    def total_len(self):
-        return len(self.__prices)
+        for _ in range(steps):
+            try:
+                self._next()
+            except StopIteration:
+                break
 
     def remaining(self):
-        return self.total_len() - len(self) - self.start
-
-    def __actual_position(self, position):
-        if position >= 0:
-            return position
-        else:
-            return self.position + position
+        return max(len(self.__prices) - self.__position - 1, 0)

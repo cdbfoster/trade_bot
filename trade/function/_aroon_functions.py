@@ -20,115 +20,63 @@ class AroonUpFunction(_Function):
         self.input = input_
         self.__period = period
 
-    def __len__(self):
-        return max(len(self.input) - self.__period + 1, 0)
+        _Function.__init__(self)
 
-    def _calculate_values(self, count):
-        count = min(count, len(self))
-        if count <= 0:
-            return []
+    def _first(self):
+        self._next()
 
-        input_ = self.input[:self.__period + count - 1]
+    def _next(self):
+        input_index = len(self) + self.__period - 1
+        if input_index >= len(self.input):
+            raise StopIteration
 
         high = (None, None)
-        for i in range(0, self.__period - 1):
-            if high[0] is not None and input_[i] > high[0] or high[0] is None:
-                high = (input_[i], i)
+        for i in range(len(self), len(self) + self.__period):
+            if high[0] is not None and self.input[i] > high[0] or high[0] is None:
+                high = (self.input[i], len(self) + self.__period - i)
 
-        values = []
-        for i in range(self.__period - 1, len(input_)):
-            if high[0] is not None and input_[i] > high[0] or high[0] is None:
-                high = (input_[i], i)
-
-            if i - high[1] >= self.__period:
-                high = (None, None)
-                for j in range(i - self.__period + 1, i + 1):
-                    if high[0] is not None and input_[j] > high[0] or high[0] is None:
-                        high = (input_[j], j)
-
-            values.append((self.__period - i + high[1]) / self.__period)
-
-        return values
+        self._values.append((self.__period - high[1]) / self.__period)
 
 class AroonDownFunction(_Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-    def __len__(self):
-        return max(len(self.input) - self.__period + 1, 0)
+        _Function.__init__(self)
 
-    def _calculate_values(self, count):
-        count = min(count, len(self))
-        if count <= 0:
-            return []
+    def _first(self):
+        self._next()
 
-        input_ = self.input[:self.__period + count - 1]
+    def _next(self):
+        input_index = len(self) + self.__period - 1
+        if input_index >= len(self.input):
+            raise StopIteration
 
         low = (None, None)
-        for i in range(0, self.__period - 1):
-            if low[0] is not None and input_[i] < low[0] or low[0] is None:
-                low = (input_[i], i)
+        for i in range(len(self), len(self) + self.__period):
+            if low[0] is not None and self.input[i] < low[0] or low[0] is None:
+                low = (self.input[i], len(self) + self.__period - i)
 
-        values = []
-        for i in range(self.__period - 1, len(input_)):
-            if low[0] is not None and input_[i] < low[0] or low[0] is None:
-                low = (input_[i], i)
-
-            if i - low[1] >= self.__period:
-                low = (None, None)
-                for j in range(i - self.__period + 1, i + 1):
-                    if low[0] is not None and input_[j] < low[0] or low[0] is None:
-                        low = (input_[j], j)
-
-            values.append((self.__period - i + low[1]) / self.__period)
-
-        return values
+        self._values.append((self.__period - low[1]) / self.__period)
 
 class AroonOscillatorFunction(_Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-    def __len__(self):
-        return max(len(self.input) - self.__period + 1, 0)
+        self.__up = AroonUpFunction(self.input, self.__period)
+        self.__down = AroonDownFunction(self.input, self.__period)
 
-    def _calculate_values(self, count):
-        count = min(count, len(self))
-        if count <= 0:
-            return []
+        _Function.__init__(self)
 
-        input_ = self.input[:self.__period + count - 1]
+    def _first(self):
+        self._next()
 
-        high = (None, None)
-        low = (None, None)
-        for i in range(0, self.__period - 1):
-            if high[0] is not None and input_[i] > high[0] or high[0] is None:
-                high = (input_[i], i)
-            if low[0] is not None and input_[i] < low[0] or low[0] is None:
-                low = (input_[i], i)
+    def _next(self):
+        self.__up._exhaust_input()
+        self.__down._exhaust_input()
 
-        values = []
-        for i in range(self.__period - 1, len(input_)):
-            if high[0] is not None and input_[i] > high[0] or high[0] is None:
-                high = (input_[i], i)
-            if low[0] is not None and input_[i] < low[0] or low[0] is None:
-                low = (input_[i], i)
+        if len(self.__up) == 0 or len(self) == len(self.__up):
+            raise StopIteration
 
-            if i - high[1] >= self.__period:
-                high = (None, None)
-                for j in range(i - self.__period + 1, i + 1):
-                    if high[0] is not None and input_[j] > high[0] or high[0] is None:
-                        high = (input_[j], j)
-
-            if i - low[1] >= self.__period:
-                low = (None, None)
-                for j in range(i - self.__period + 1, i + 1):
-                    if low[0] is not None and input_[j] < low[0] or low[0] is None:
-                        low = (input_[j], j)
-
-            aroon_up = (self.__period - i + high[1]) / self.__period
-            aroon_down = (self.__period - i + low[1]) / self.__period
-            values.append(aroon_up - aroon_down)
-
-        return values
+        self._values.append(self.__up[len(self)] - self.__down[len(self)])

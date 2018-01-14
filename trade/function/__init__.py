@@ -14,27 +14,63 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 class _Function:
+    def __init__(self):
+        self._values = []
+        self._exhaust_input()
+
     def __len__(self):
-        return len(self._get_range())
+        return len(self._values)
 
     def __getitem__(self, index):
         if isinstance(index, int):
+            self.__ensure_index(index)
+
             if index >= len(self) or index < -len(self):
                 raise ValueError("function index out of range")
+
             if index < 0:
                 index += len(self)
-            return self._calculate_values(index + 1)[-1]
+
+            return self._values[index]
         elif isinstance(index, slice):
-            return self._calculate_values(len(self))[index]
+            if index.start is not None and not isinstance(index.start, int):
+                raise TypeError("slice indices must be integers or None")
+            if index.stop is not None and not isinstance(index.stop, int):
+                raise TypeError("slice indices must be integers or None")
+
+            if index.stop is None or index.stop < 0:
+                self.__ensure_index(-1)
+            else:
+                self.__ensure_index(index.stop)
+
+            return self._values[index]
         else:
             raise TypeError("function indices must be integers or slices")
 
+    def _first(self):
+        pass
+
+    def _next(self):
+        pass
+
+    def _exhaust_input(self):
+        self.__ensure_index(-1)
+
+    def __ensure_index(self, index):
+        while len(self) <= index if index > 0 else True:
+            try:
+                if len(self._values) == 0:
+                    self._first()
+                else:
+                    self._next()
+            except StopIteration:
+                break
+
     def save(self, filename, mode='w', save_input=False):
         f = open(filename, mode)
-        input_ = self.input[-len(self):] if save_input and 'input' in dir(self) else None
         for i, x in enumerate(self):
-            if input_ is not None:
-                f.write("{} ".format(input_[i]))
+            if save_input and 'input' in dir(self):
+                f.write("{} ".format(self.input[i - len(self)]))
             f.write("{}\n".format(x))
         f.close()
 
@@ -43,13 +79,15 @@ class _Function:
 
     class __Iter:
         def __init__(self, function):
-            self.values = function[:]
+            self.function = function
             self.position = 0
 
+            self.function._exhaust_input()
+
         def __next__(self):
-            if self.position < len(self.values):
+            if self.position < len(self.function):
                 self.position += 1
-                return self.values[self.position - 1]
+                return self.function[self.position - 1]
             raise StopIteration
 
 from ._aroon_functions import AroonUpFunction, AroonDownFunction, AroonOscillatorFunction
