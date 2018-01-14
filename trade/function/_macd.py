@@ -39,3 +39,25 @@ class Macd(Function):
 
         offset = len(self.__short) - len(self.__long)
         self._values.append(self.__short[len(self) + offset] - self.__long[len(self)])
+
+class MacdHistogram(Function):
+    def __init__(self, input_, short_period, long_period, signal_period):
+        self.input = input_
+
+        self.__macd = Macd(input_, short_period=short_period, long_period=long_period)
+        self.__macd_signal = Ema(self.__macd, period=signal_period)
+
+        Function.__init__(self)
+
+    def _first(self):
+        self._next()
+
+    def _next(self):
+        self.__macd._exhaust_input()
+        self.__macd_signal._exhaust_input()
+
+        if len(self.__macd_signal) == 0 or len(self) == len(self.__macd_signal):
+            raise StopIteration
+
+        offset = len(self.__macd) - len(self.__macd_signal)
+        self._values.append(self.__macd[len(self) + offset] - self.__macd_signal[len(self)])
