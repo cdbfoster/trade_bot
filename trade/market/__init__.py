@@ -24,7 +24,7 @@ class OrderType(Enum):
     IMMEDIATE = auto()
     MARKET = auto()
 
-class _Market:
+class Market:
     def __init__(self, exchange_currency, base_currency):
         self.exchange_currency = exchange_currency
         self.base_currency = base_currency

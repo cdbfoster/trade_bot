@@ -18,10 +18,10 @@ import json
 import threading
 
 from trade.function import Function
-from trade.market import _Market, OrderSide, OrderType
+from trade.market import Market, OrderSide, OrderType
 from trade.util import WebSocketClient
 
-class GeminiMarket(Function, _Market):
+class GeminiMarket(Function, Market):
     class Symbol(Enum):
         BTCUSD = "btcusd"
         ETHUSD = "ethusd"
