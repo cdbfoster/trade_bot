@@ -14,12 +14,12 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 from trade.indicator import Signal
-from trade.investor import _Investor
+from trade.investor import Investor
 from trade.market import OrderSide, OrderType
 
-class SingleIndicatorInvestor(_Investor):
+class SingleIndicatorInvestor(Investor):
     def __init__(self, market, indicator, maximum_trade=None, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_campaigns=1, exchange_amount=None, base_amount=None, debug=None):
-        _Investor.__init__(self, market, exchange_amount, base_amount)
+        Investor.__init__(self, market, exchange_amount, base_amount)
 
         self.debug = debug
 

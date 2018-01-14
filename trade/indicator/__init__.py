@@ -21,7 +21,7 @@ class Signal(_Enum):
     HOLD = 0
     SELL = -1
 
-class _Indicator:
+class Indicator:
     def get_signal(self):
         pass
 

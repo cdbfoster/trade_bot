@@ -16,9 +16,9 @@
 import math
 
 from trade.function import AroonOscillatorFunction
-from trade.indicator import _Indicator, Signal
+from trade.indicator import Indicator, Signal
 
-class AroonOscillatorIndicator(_Indicator):
+class AroonOscillatorIndicator(Indicator):
     def __init__(self, input_, period, debug=None):
         self.__input = input_
         self.__period = period

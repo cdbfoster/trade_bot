@@ -16,9 +16,9 @@
 import math
 import numpy as np
 
-from trade.indicator import _Indicator, Signal
+from trade.indicator import Indicator, Signal
 
-class RsiIndicator(_Indicator):
+class RsiIndicator(Indicator):
     def __init__(self, input_source, period=14, threshold=0.3, debug=None):
         self.__input_source = input_source
         self.__period = period

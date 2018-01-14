@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-class _Investor:
+class Investor:
     def __init__(self, market, exchange_amount=None, base_amount=None):
         self.market = market
 
