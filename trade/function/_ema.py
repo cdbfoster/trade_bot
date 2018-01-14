@@ -41,3 +41,6 @@ class Ema(Function):
             raise StopIteration
 
         self._values.append((self.input[input_index] - self._values[-1]) * self.__weight + self._values[-1])
+
+def ema(input_, period):
+    return Ema(input_, period)[:]

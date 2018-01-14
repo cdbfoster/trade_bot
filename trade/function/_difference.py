@@ -30,3 +30,6 @@ class Difference(Function):
             raise StopIteration
 
         self._values.append(self.input[input_index] - self.input[input_index - 1])
+
+def difference(input_):
+    return Difference(input_)[:]

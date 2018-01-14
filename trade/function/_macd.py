@@ -61,3 +61,9 @@ class MacdHistogram(Function):
 
         offset = len(self.__macd) - len(self.__macd_signal)
         self._values.append(self.__macd[len(self) + offset] - self.__macd_signal[len(self)])
+
+def macd(input_, short_period, long_period):
+    return Macd(input_, short_period, long_period)[:]
+
+def macd_histogram(input_, short_period, long_period, signal_period):
+    return MacdHistogram(input_, short_period, long_period, signal_period)[:]

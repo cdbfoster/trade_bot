@@ -54,3 +54,6 @@ class Rsi(Function):
         self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__difference[input_index], 0)) / self.__period
 
         self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss))
+
+def rsi(input_, period):
+    return Rsi(input_, period)[:]

@@ -80,3 +80,12 @@ class AroonOscillator(Function):
             raise StopIteration
 
         self._values.append(self.__up[len(self)] - self.__down[len(self)])
+
+def aroon_up(input_, period):
+    return AroonUp(input_, period)[:]
+
+def aroon_down(input_, period):
+    return AroonDown(input_, period)[:]
+
+def aroon_oscillator(input_, period):
+    return AroonOscillator(input_, period)[:]

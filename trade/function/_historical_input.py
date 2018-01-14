@@ -48,3 +48,6 @@ class HistoricalInput(Function):
 
     def remaining(self):
         return max(len(self.__prices) - self.__position - 1, 0)
+
+def historical_input(filename):
+    return HistoricalInput(filename)[:]
