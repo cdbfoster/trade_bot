@@ -15,7 +15,7 @@
 
 from trade.function import Function
 
-class HistoricalInputFunction(Function):
+class HistoricalInput(Function):
     def __init__(self, filename, start=None, position=None, reverse=False):
         self.__prices = list(float(line.strip()) for line in open(filename))
 

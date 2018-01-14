@@ -17,7 +17,7 @@ import numpy as np
 
 from trade.function import Function
 
-class EmaFunction(Function):
+class Ema(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period

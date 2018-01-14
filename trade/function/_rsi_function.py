@@ -15,14 +15,14 @@
 
 import numpy as np
 
-from trade.function import Function, DifferenceFunction
+from trade.function import Function, Difference
 
-class RsiFunction(Function):
+class Rsi(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-        self.__difference = DifferenceFunction(input_)
+        self.__difference = Difference(input_)
         self.__average_gain = None
         self.__average_loss = None
 

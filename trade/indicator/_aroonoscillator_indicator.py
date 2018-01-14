@@ -15,7 +15,7 @@
 
 import math
 
-from trade.function import AroonOscillatorFunction
+from trade.function import AroonOscillator
 from trade.indicator import Indicator, Signal
 
 class AroonOscillatorIndicator(Indicator):
@@ -27,7 +27,7 @@ class AroonOscillatorIndicator(Indicator):
         if debug is not None:
             debug.write("input aroon-oscillator signal\n")
 
-        self.__aroon_oscillator = AroonOscillatorFunction(input_, period=period)
+        self.__aroon_oscillator = AroonOscillator(input_, period=period)
         self.__last_spike = None
         self.__threshold = 1 - 1 / self.__period
 

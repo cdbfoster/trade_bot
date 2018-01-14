@@ -15,7 +15,7 @@
 
 from trade.function import Function
 
-class AroonUpFunction(Function):
+class AroonUp(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
@@ -37,7 +37,7 @@ class AroonUpFunction(Function):
 
         self._values.append((self.__period - high[1]) / self.__period)
 
-class AroonDownFunction(Function):
+class AroonDown(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
@@ -59,13 +59,13 @@ class AroonDownFunction(Function):
 
         self._values.append((self.__period - low[1]) / self.__period)
 
-class AroonOscillatorFunction(Function):
+class AroonOscillator(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-        self.__up = AroonUpFunction(self.input, self.__period)
-        self.__down = AroonDownFunction(self.input, self.__period)
+        self.__up = AroonUp(self.input, self.__period)
+        self.__down = AroonDown(self.input, self.__period)
 
         Function.__init__(self)
 

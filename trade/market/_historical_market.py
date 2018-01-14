@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import HistoricalInputFunction
+from trade.function import HistoricalInput
 from trade.market import Market, OrderSide, OrderType
 
-class HistoricalMarket(Market, HistoricalInputFunction):
+class HistoricalMarket(Market, HistoricalInput):
     def __init__(self, exchange_currency, base_currency, filename, trade_loss=0.001, transaction_fee=0.0025, start=None, position=None, reverse=False):
         Market.__init__(self, exchange_currency, base_currency)
-        HistoricalInputFunction.__init__(self, filename, start, position, reverse)
+        HistoricalInput.__init__(self, filename, start, position, reverse)
 
         self.__trade_loss = trade_loss
         self.__transaction_fee = transaction_fee

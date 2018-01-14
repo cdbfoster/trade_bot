@@ -90,10 +90,10 @@ class Function:
                 return self.function[self.position - 1]
             raise StopIteration
 
-from ._aroon_functions import AroonUpFunction, AroonDownFunction, AroonOscillatorFunction
-from ._difference_function import DifferenceFunction
-from ._ema_function import EmaFunction
-from ._historicalinput_function import HistoricalInputFunction
-from ._macd_function import MacdFunction
-from ._macdhistogram_function import MacdHistogramFunction
-from ._rsi_function import RsiFunction
+from ._aroon_functions import AroonUp, AroonDown, AroonOscillator
+from ._difference_function import Difference
+from ._ema_function import Ema
+from ._historicalinput_function import HistoricalInput
+from ._macd_function import Macd
+from ._macdhistogram_function import MacdHistogram
+from ._rsi_function import Rsi

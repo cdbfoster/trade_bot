@@ -15,7 +15,7 @@
 
 from trade.function import Function
 
-class DifferenceFunction(Function):
+class Difference(Function):
     def __init__(self, input_):
         self.input = input_
 
