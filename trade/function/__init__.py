@@ -98,4 +98,3 @@ from ._macd_function import MacdFunction
 from ._macdhistogram_function import MacdHistogramFunction
 from ._movingsum_function import MovingSumFunction
 from ._rsi_function import RsiFunction
-from ._rsicenterline_function import RsiCenterlineFunction
