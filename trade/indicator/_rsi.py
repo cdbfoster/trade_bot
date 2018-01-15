@@ -16,7 +16,7 @@
 from trade.function import Rsi as RsiFunction
 from trade.indicator import Indicator, Signal
 
-class RsiIndicator(Indicator):
+class Rsi(Indicator):
     def __init__(self, input_, period, threshold):
         self.input = input_
         self.__period = period

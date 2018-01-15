@@ -35,4 +35,4 @@ class Indicator(Function):
 from ._aroon_oscillator import AroonOscillator
 from ._ema_crossover import EmaCrossover
 from ._macd_signal_crossover import MacdSignalCrossover
-from ._rsi_indicator import RsiIndicator
+from ._rsi import Rsi
