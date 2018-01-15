@@ -14,103 +14,31 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-import numpy as np
 
+from trade.function import MacdHistogram
 from trade.indicator import Indicator, Signal
 
 class MacdSignalCrossoverIndicator(Indicator):
-    def __init__(self, input_source, short_period=320, long_period=720, signal_period=250, debug=None):
-        self.__input_source = input_source
+    def __init__(self, input_, short_period, long_period, signal_period):
+        self.input = input_
         self.__short_period = short_period
         self.__long_period = long_period
         self.__signal_period = signal_period
-        self.debug = debug
 
-        if self.debug is not None:
-            self.debug.write("input short long macd macd-signal macd-hist signal\n")
+        self.__macd_histogram = MacdHistogram(self.input, self.__short_period, self.__long_period, self.__signal_period)
 
-        self.__short_ema = None
-        self.__long_ema = None
-        self.__signal_ema = None
-        self.__initialize__()
+        Indicator.__init__(self)
 
-        self.__old_macd_hist = None
+    def _next(self):
+        self.__macd_histogram._exhaust_input()
 
-    def get_signal(self):
-        if self.__short_ema is None or self.__long_ema is None or self.__signal_ema is None:
-            if not self.__initialize__():
-                return None
+        if len(self.__macd_histogram) < 2 or len(self) == len(self.__macd_histogram) - 1:
+            raise StopIteration
 
-        macd_hist = self.__short_ema - self.__long_ema - self.__signal_ema
-        if math.copysign(1, macd_hist) != math.copysign(1, self.__old_macd_hist):
-            return Signal.BUY if macd_hist >= 0 else Signal.SELL
-            #if self.__signal_ema < 0:
-            #    return Signal.BUY if macd_hist >= 0 else Signal.HOLD
-            #else:
-            #    return Signal.SELL if macd_hist < 0 else Signal.HOLD
-        return Signal.HOLD
+        last_hist = self.__macd_histogram[len(self)]
+        this_hist = self.__macd_histogram[len(self) + 1]
 
-    def update(self, steps=1):
-        if self.__short_ema is None or self.__long_ema is None or self.__signal_ema is None:
-            self.__initialize__()
+        if math.copysign(1, last_hist) != math.copysign(1, this_hist):
+            self._values.append(Signal.BUY if math.copysign(1, this_hist) > 0 else Signal.SELL)
         else:
-            for i in range(-steps, 0):
-                self.__old_macd_hist = self.__short_ema - self.__long_ema - self.__signal_ema
-                self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, self.__short_weight)
-                self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, self.__long_weight)
-                self.__signal_ema = _update_ema(self.__short_ema - self.__long_ema, self.__signal_ema, self.__signal_weight)
-
-                if self.debug is not None:
-                    signal = self.get_signal()
-                    self.debug.write("{} {} {} {} {} {} {}\n".format(
-                        self.__input_source[i],
-                        self.__short_ema,
-                        self.__long_ema,
-                        self.__short_ema - self.__long_ema,
-                        self.__signal_ema,
-                        self.__short_ema - self.__long_ema - self.__signal_ema,
-                        signal.value if signal is not None else 0,
-                    ))
-
-    def __initialize__(self):
-        if len(self.__input_source) < 2 * self.__long_period + 2 * self.__signal_period:
-            self.__short_ema = None
-            self.__long_ema = None
-            self.__signal_ema = None
-            return False
-
-        self.__short_weight = 2 / (self.__short_period + 1)
-        self.__long_weight = 2 / (self.__long_period + 1)
-        self.__signal_weight = 2 / (self.__signal_period + 1)
-
-        initial_data = self.__input_source[:-2 * self.__signal_period]
-        self.__short_ema = _ema(initial_data, self.__short_period)
-        self.__long_ema = _ema(initial_data, self.__long_period)
-
-        sma = 0
-        for i in range(-2 * self.__signal_period, -self.__signal_period):
-            self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, self.__short_weight)
-            self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, self.__long_weight)
-            sma += self.__short_ema - self.__long_ema
-        sma /= self.__signal_period
-        self.__signal_ema = sma
-
-        # Don't write to the debug file during initialization
-        debug = self.debug
-        self.debug = None
-        self.update(steps=self.__signal_period)
-        self.debug = debug
-
-        return True
-
-def _ema(values, period):
-    ema = np.mean(values[:period])
-    weight = 2 / (period + 1)
-
-    for x in values[period:]:
-        ema = _update_ema(x, ema, weight)
-
-    return ema
-
-def _update_ema(value, current, weight):
-    return (value - current) * weight + current
+            self._values.append(Signal.HOLD)
