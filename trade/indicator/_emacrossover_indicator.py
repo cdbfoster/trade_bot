@@ -13,74 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
+import math
 
+from trade.function import Macd
 from trade.indicator import Indicator, Signal
 
 class EmaCrossoverIndicator(Indicator):
-    def __init__(self, input_source, short_period, long_period, debug=None):
-        self.__input_source = input_source
+    def __init__(self, input_, short_period, long_period):
+        self.input = input_
         self.__short_period = short_period
         self.__long_period = long_period
-        self.debug = debug
 
-        if self.debug is not None:
-            self.debug.write("input short long signal\n")
+        self.__macd = Macd(self.input, self.__short_period, self.__long_period)
 
-        self.__short_ema = None
-        self.__long_ema = None
-        self.__initialize__()
+        Indicator.__init__(self)
 
-        self.__old_signal = None
+    def _next(self):
+        self.__macd._exhaust_input()
 
-    def get_signal(self):
-        if self.__short_ema is None or self.__long_ema is None:
-            if not self.__initialize__():
-                return None
+        if len(self.__macd) < 2 or len(self) == len(self.__macd) - 1:
+            raise StopIteration
 
-        new_signal = Signal.BUY if self.__short_ema - self.__long_ema > 0 else Signal.SELL
-        return new_signal if new_signal != self.__old_signal else Signal.HOLD
+        last_macd = self.__macd[len(self)]
+        this_macd = self.__macd[len(self) + 1]
 
-    def update(self, steps=1):
-        if self.__short_ema is None or self.__long_ema is None:
-            self.__initialize__()
+        if math.copysign(1, last_macd) != math.copysign(1, this_macd):
+            self._values.append(Signal.BUY if math.copysign(1, this_macd) > 0 else Signal.SELL)
         else:
-            for i in range(-steps, 0):
-                self.__old_signal = Signal.BUY if self.__short_ema - self.__long_ema > 0 else Signal.SELL
-                self.__short_ema = _update_ema(self.__input_source[i], self.__short_ema, self.__short_weight)
-                self.__long_ema = _update_ema(self.__input_source[i], self.__long_ema, self.__long_weight)
-
-                if self.debug is not None:
-                    signal = self.get_signal()
-                    self.debug.write("{} {} {} {}\n".format(
-                        self.__input_source[i],
-                        self.__short_ema,
-                        self.__long_ema,
-                        signal.value if signal is not None else 0,
-                    ))
-
-    def __initialize__(self):
-        if len(self.__input_source) < 2 * self.__long_period:
-            self.__short_ema = None
-            self.__long_ema = None
-            return False
-
-        self.__short_weight = 2 / (self.__short_period + 1)
-        self.__long_weight = 2 / (self.__long_period + 1)
-
-        self.__short_ema = _ema(self.__input_source, self.__short_period)
-        self.__long_ema = _ema(self.__input_source, self.__long_period)
-
-        return True
-
-def _ema(values, period):
-    ema = np.mean(values[:period])
-    weight = 2 / (period + 1)
-
-    for x in values[period:]:
-        ema = _update_ema(x, ema, weight)
-
-    return ema
-
-def _update_ema(value, current, weight):
-    return (value - current) * weight + current
+            self._values.append(Signal.HOLD)
