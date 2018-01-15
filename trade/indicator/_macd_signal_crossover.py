@@ -18,7 +18,7 @@ import math
 from trade.function import MacdHistogram
 from trade.indicator import Indicator, Signal
 
-class MacdSignalCrossoverIndicator(Indicator):
+class MacdSignalCrossover(Indicator):
     def __init__(self, input_, short_period, long_period, signal_period):
         self.input = input_
         self.__short_period = short_period
