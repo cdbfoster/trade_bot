@@ -13,19 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from enum import Enum as _Enum
-from enum import auto as _auto
+from enum import Enum
 
-class Signal(_Enum):
+from trade.function import Function
+
+class Signal(Enum):
     BUY = 1
     HOLD = 0
     SELL = -1
 
-class Indicator:
-    def get_signal(self):
+class Indicator(Function):
+    def __init__(self):
+        Function.__init__(self)
+
+    def _first(self):
         pass
 
-    def update(self, steps=1):
+    def _next(self):
         pass
 
 from ._aroonoscillator_indicator import AroonOscillatorIndicator
