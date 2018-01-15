@@ -19,46 +19,32 @@ from trade.function import AroonOscillator
 from trade.indicator import Indicator, Signal
 
 class AroonOscillatorIndicator(Indicator):
-    def __init__(self, input_, period, debug=None):
-        self.__input = input_
+    def __init__(self, input_, period):
+        self.input = input_
         self.__period = period
-        self.debug = debug
 
-        if debug is not None:
-            debug.write("input aroon-oscillator signal\n")
-
-        self.__aroon_oscillator = AroonOscillator(input_, period=period)
+        self.__aroon_oscillator = AroonOscillator(self.input, self.__period)
         self.__last_spike = None
         self.__threshold = 1 - 1 / self.__period
 
-    def get_signal(self):
-        if len(self.__aroon_oscillator) < 2:
-            return None
+        Indicator.__init__(self)
 
-        ao = self.__aroon_oscillator[-2:]
+    def _first(self):
+        self._next()
 
-        if math.copysign(1, ao[-2]) != math.copysign(1, ao[-1]):
-            return self.__last_spike if self.__last_spike is not None and self.__last_spike.value == math.copysign(1, ao[-1]) else Signal.HOLD
+    def _next(self):
+        self.__aroon_oscillator._exhaust_input()
 
-        return Signal.HOLD
+        if len(self.__aroon_oscillator) < 2 or len(self) == len(self.__aroon_oscillator) - 1:
+            raise StopIteration
 
-    def update(self, steps=1):
-        ao = self.__aroon_oscillator[-steps - 1:]
-        input_ = self.__input[-len(ao):] if self.debug is not None and len(ao) > 0 else None
+        last_aro = self.__aroon_oscillator[len(self)]
+        this_aro = self.__aroon_oscillator[len(self) + 1]
 
-        if len(ao) == 0:
-            return
+        if abs(last_aro) >= self.__threshold:
+            self.__last_spike = Signal.SELL if math.copysign(1, last_aro) > 0 else Signal.BUY
 
-        for i, a in enumerate(ao[1:]):
-            i += 1
-            if abs(a) >= self.__threshold:
-                self.__last_spike = Signal.BUY if a < 0 else Signal.SELL
-
-            if self.debug is not None and len(ao) > steps:
-                signal = self.__last_spike if math.copysign(1, ao[i - 1]) != math.copysign(1, ao[i]) and \
-                    self.__last_spike is not None and self.__last_spike.value == math.copysign(1, ao[i]) else None
-                self.debug.write("{} {} {}\n".format(
-                    input_[i],
-                    ao[i],
-                    signal.value if signal is not None else 0,
-                ))
+        if math.copysign(1, last_aro) != math.copysign(1, this_aro) and self.__last_spike is not None:
+            self._values.append(self.__last_spike if self.__last_spike.value == math.copysign(1, this_aro) else Signal.HOLD)
+        else:
+            self._values.append(Signal.HOLD)
