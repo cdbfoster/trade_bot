@@ -33,6 +33,6 @@ class Indicator(Function):
         pass
 
 from ._aroon_oscillator import AroonOscillator
-from ._emacrossover_indicator import EmaCrossoverIndicator
+from ._ema_crossover import EmaCrossover
 from ._macdsignalcrossover_indicator import MacdSignalCrossoverIndicator
 from ._rsi_indicator import RsiIndicator

@@ -18,7 +18,7 @@ import math
 from trade.function import Macd
 from trade.indicator import Indicator, Signal
 
-class EmaCrossoverIndicator(Indicator):
+class EmaCrossover(Indicator):
     def __init__(self, input_, short_period, long_period):
         self.input = input_
         self.__short_period = short_period
