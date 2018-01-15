@@ -13,65 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-import numpy as np
-
+from trade.function import Rsi as RsiFunction
 from trade.indicator import Indicator, Signal
 
 class RsiIndicator(Indicator):
-    def __init__(self, input_source, period=14, threshold=0.3, debug=None):
-        self.__input_source = input_source
+    def __init__(self, input_, period, threshold):
+        self.input = input_
         self.__period = period
         self.__threshold = threshold
-        self.debug = debug
 
-        if self.debug is not None:
-            self.debug.write("input rsi signal\n");
+        self.__rsi = RsiFunction(self.input, self.__period)
 
-        self.__average_gain = None
-        self.__average_loss = None
-        self.__initialize__()
+        Indicator.__init__(self)
 
-    def get_signal(self):
-        if self.__average_gain is None or self.__average_loss is None:
-            if not self.__initialize__():
-                return None
+    def _next(self):
+        self.__rsi._exhaust_input()
 
-        rsi = 1 - 1 / (1 + self.__average_gain / abs(self.__average_loss))
-        if rsi > 1 - self.__threshold:
-            return Signal.SELL
-        elif rsi < self.__threshold:
-            return Signal.BUY
+        if len(self.__rsi) == 0 or len(self) == len(self.__rsi):
+            raise StopIteration
+
+        if self.__rsi[len(self)] > 100 - self.__threshold:
+            self._values.append(Signal.SELL)
+        elif self.__rsi[len(self)] < self.__threshold:
+            self._values.append(Signal.BUY)
         else:
-            return Signal.HOLD
-
-    def update(self, steps=1):
-        if self.__average_gain is None or self.__average_loss is None:
-            self.__initialize__()
-        else:
-            for i in range(-steps, 0):
-                difference = self.__input_source[i] - self.__input_source[i - 1]
-                self.__average_gain = (self.__average_gain * (self.__period - 1) + max(difference, 0)) / self.__period
-                self.__average_loss = (self.__average_loss * (self.__period - 1) + min(difference, 0)) / self.__period
-
-                if self.debug is not None:
-                    signal = self.get_signal()
-                    self.debug.write("{} {} {}\n".format(
-                        self.__input_source[i],
-                        1 - 1 / (1 + self.__average_gain / abs(self.__average_loss)),
-                        signal.value if signal is not None else 0,
-                    ))
-
-    def __initialize__(self):
-        if len(self.__input_source) < 2 * self.__period + 1:
-            self.__average_gain = None
-            self.__average_loss = None
-            return False
-
-        differences = [self.__input_source[i + 1] - self.__input_source[i] for i in range(len(self.__input_source) - 1)]
-        self.__average_gain = np.mean([max(x, 0) for x in differences[:self.__period]])
-        self.__average_loss = np.mean([min(x, 0) for x in differences[:self.__period]])
-
-        for x in differences[self.__period:]:
-            self.__average_gain = (self.__average_gain * (self.__period - 1) + max(x, 0)) / self.__period
-            self.__average_loss = (self.__average_loss * (self.__period - 1) + min(x, 0)) / self.__period
+            self._values.append(Signal.HOLD)
