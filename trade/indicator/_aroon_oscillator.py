@@ -15,15 +15,15 @@
 
 import math
 
-from trade.function import AroonOscillator
+from trade.function import AroonOscillator as AroonOscillatorFunction
 from trade.indicator import Indicator, Signal
 
-class AroonOscillatorIndicator(Indicator):
+class AroonOscillator(Indicator):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-        self.__aroon_oscillator = AroonOscillator(self.input, self.__period)
+        self.__aroon_oscillator = AroonOscillatorFunction(self.input, self.__period)
         self.__last_spike = None
         self.__threshold = 1 - 1 / self.__period
 
