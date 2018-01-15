@@ -22,9 +22,6 @@ class AroonUp(Function):
 
         Function.__init__(self)
 
-    def _first(self):
-        self._next()
-
     def _next(self):
         input_index = len(self) + self.__period - 1
         if input_index >= len(self.input):
@@ -43,9 +40,6 @@ class AroonDown(Function):
         self.__period = period
 
         Function.__init__(self)
-
-    def _first(self):
-        self._next()
 
     def _next(self):
         input_index = len(self) + self.__period - 1
@@ -68,9 +62,6 @@ class AroonOscillator(Function):
         self.__down = AroonDown(self.input, self.__period)
 
         Function.__init__(self)
-
-    def _first(self):
-        self._next()
 
     def _next(self):
         self.__up._exhaust_input()

@@ -28,9 +28,6 @@ class HistoricalInput(Function):
 
         Function.__init__(self)
 
-    def _first(self):
-        self._next()
-
     def _next(self):
         if len(self) > self.__position or len(self.__prices) == 0:
             raise StopIteration

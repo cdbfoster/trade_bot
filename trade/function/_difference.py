@@ -21,9 +21,6 @@ class Difference(Function):
 
         Function.__init__(self)
 
-    def _first(self):
-        self._next()
-
     def _next(self):
         input_index = len(self) + 1
         if input_index >= len(self.input):

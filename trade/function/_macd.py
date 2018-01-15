@@ -27,9 +27,6 @@ class Macd(Function):
 
         Function.__init__(self)
 
-    def _first(self):
-        self._next()
-
     def _next(self):
         self.__short._exhaust_input()
         self.__long._exhaust_input()
@@ -48,9 +45,6 @@ class MacdHistogram(Function):
         self.__macd_signal = Ema(self.__macd, period=signal_period)
 
         Function.__init__(self)
-
-    def _first(self):
-        self._next()
 
     def _next(self):
         self.__macd._exhaust_input()

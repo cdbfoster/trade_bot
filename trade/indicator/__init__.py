@@ -27,7 +27,7 @@ class Indicator(Function):
         Function.__init__(self)
 
     def _first(self):
-        pass
+        self._next()
 
     def _next(self):
         pass

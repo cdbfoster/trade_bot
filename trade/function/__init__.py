@@ -48,7 +48,7 @@ class Function:
             raise TypeError("function indices must be integers or slices")
 
     def _first(self):
-        pass
+        self._next()
 
     def _next(self):
         pass

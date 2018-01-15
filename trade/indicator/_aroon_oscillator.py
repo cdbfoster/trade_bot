@@ -29,9 +29,6 @@ class AroonOscillator(Indicator):
 
         Indicator.__init__(self)
 
-    def _first(self):
-        self._next()
-
     def _next(self):
         self.__aroon_oscillator._exhaust_input()
 
