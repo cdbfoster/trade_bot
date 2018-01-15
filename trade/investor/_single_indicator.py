@@ -18,8 +18,8 @@ from trade.investor import Investor
 from trade.market import OrderSide, OrderType
 
 class SingleIndicatorInvestor(Investor):
-    def __init__(self, market, indicator, maximum_trade=None, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_campaigns=1, exchange_amount=None, base_amount=None, debug=None):
-        Investor.__init__(self, market, exchange_amount, base_amount)
+    def __init__(self, market, indicator, maximum_trade=None, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_campaigns=1, debug=None):
+        Investor.__init__(self, market)
 
         self.debug = debug
 
@@ -34,7 +34,7 @@ class SingleIndicatorInvestor(Investor):
         self.campaigns = []
 
     def tick(self):
-        signal = self.indicator.get_signal()
+        signal = self.indicator[-1]
 
         if signal is None or signal == Signal.HOLD:
             return

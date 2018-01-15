@@ -14,16 +14,10 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 class Investor:
-    def __init__(self, market, exchange_amount=None, base_amount=None):
+    def __init__(self, market):
         self.market = market
-
-        if exchange_amount is not None:
-            self.market.balance[self.market.exchange_currency] = exchange_amount
-
-        if base_amount is not None:
-            self.market.balance[self.market.base_currency] = base_amount
 
     def tick(self):
         pass
 
-from ._singleindicator_investor import SingleIndicatorInvestor
+from ._single_indicator import SingleIndicator
