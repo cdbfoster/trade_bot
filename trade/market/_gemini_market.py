@@ -36,19 +36,15 @@ class GeminiMarket(Function, Market):
 
         self.__public_listener = PublicListener(self.__symbol, reset_timeout, sandbox, record_trades)
 
-    def __getitem__(self, value):
-        return self.__prices[value]
+        Function.__init__(self)
 
-    def __len__(self):
-        return len(self.__prices)
+    def _next(self):
+        raise StopIteration
 
-    def update(self, steps=1):
-        if steps != 1:
-            raise ValueError("Gemini market cannot update more than one step.")
-
+    def tick(self):
         last_trade_price = self.__public_listener.last_trade_price
         if last_trade_price is not None:
-            self.__prices.append(last_trade_price)
+            self._values.append(last_trade_price)
 
     def place_order(self, order_side, order_type, amount, cancel_existing=True):
         pass
