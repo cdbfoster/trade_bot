@@ -17,7 +17,7 @@ from trade.indicator import Signal
 from trade.investor import Investor
 from trade.market import OrderSide, OrderType
 
-class SingleIndicatorInvestor(Investor):
+class SingleIndicator(Investor):
     def __init__(self, market, indicator, maximum_trade=None, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_campaigns=1, debug=None):
         Investor.__init__(self, market)
 
