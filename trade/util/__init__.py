@@ -13,5 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
+from ._grapher import Grapher
 from ._tradebenchmarker import TradeBenchmarker
 from ._websocketclient import WebSocketClient
