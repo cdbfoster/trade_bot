@@ -91,6 +91,7 @@ class Function:
             raise StopIteration
 
 from ._aroon import AroonUp, AroonDown, AroonOscillator, aroon_up, aroon_down, aroon_oscillator
+from ._change_period import ChangePeriod, change_period
 from ._difference import Difference, difference
 from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
