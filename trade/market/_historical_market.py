@@ -15,6 +15,7 @@
 
 from trade.function import HistoricalInput
 from trade.market import Market, OrderSide, OrderType
+from trade.util import down_price, up_price
 
 class HistoricalMarket(Market, HistoricalInput):
     def __init__(self, exchange_currency, base_currency, filename, trade_loss=0.001, transaction_fee=0.0025, start=None, position=None, reverse=False):
@@ -29,11 +30,11 @@ class HistoricalMarket(Market, HistoricalInput):
         base_amount = None
 
         if order_side == OrderSide.BUY:
-            exchange_amount = amount * (1 - self.__transaction_fee) / (self.get_last_price() * (1 + self.__trade_loss))
+            exchange_amount = amount / up_price(self.get_last_price(), self.__trade_loss, self.__transaction_fee)
             base_amount = amount
         elif order_side == OrderSide.SELL:
             exchange_amount = amount
-            base_amount = amount * (self.get_last_price() * (1 - self.__trade_loss)) * (1 - self.__transaction_fee)
+            base_amount = amount * down_price(self.get_last_price(), self.__trade_loss, self.__transaction_fee)
         else:
             raise ValueError("invalid order side")
 

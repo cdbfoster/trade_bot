@@ -14,5 +14,6 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 from ._grapher import Grapher
+from ._price_calculations import down_price, return_price, return_value, up_price
 from ._tradebenchmarker import TradeBenchmarker
 from ._websocketclient import WebSocketClient
