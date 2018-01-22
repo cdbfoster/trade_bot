@@ -32,7 +32,7 @@ class AroonUp(Function):
             if high[0] is not None and self.input[i] > high[0] or high[0] is None:
                 high = (self.input[i], len(self) + self.__period - i)
 
-        self._values.append((self.__period - high[1]) / self.__period)
+        self._values.append(100 * (self.__period - high[1]) / self.__period)
 
 class AroonDown(Function):
     def __init__(self, input_, period):
@@ -51,7 +51,7 @@ class AroonDown(Function):
             if low[0] is not None and self.input[i] < low[0] or low[0] is None:
                 low = (self.input[i], len(self) + self.__period - i)
 
-        self._values.append((self.__period - low[1]) / self.__period)
+        self._values.append(100 * (self.__period - low[1]) / self.__period)
 
 class AroonOscillator(Function):
     def __init__(self, input_, period):

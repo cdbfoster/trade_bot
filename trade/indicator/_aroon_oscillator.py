@@ -25,7 +25,7 @@ class AroonOscillator(Indicator):
 
         self.__aroon_oscillator = AroonOscillatorFunction(self.input, self.__period)
         self.__last_spike = None
-        self.__threshold = 1 - 1 / self.__period
+        self.__threshold = 100 - 100 / self.__period
 
         Indicator.__init__(self)
 
