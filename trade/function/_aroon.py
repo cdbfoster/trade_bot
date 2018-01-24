@@ -76,6 +76,29 @@ class AroonOscillator(Function):
 
         self._values.append(self.__up[len(self)] - self.__down[len(self)])
 
+class PeriodAdjustedAroonOscillator(Function):
+    def __init__(self, input_, period_function, max_period):
+        self.input = input_
+        self.__period = period_function
+        self.__max_period = max_period
+
+        Function.__init__(self)
+
+    def _next(self):
+        self.__period._update()
+        self.input._update()
+
+        input_index = len(self) + self.__max_period
+        if len(self) >= len(self.__period)  or input_index > len(self.input):
+            raise StopIteration
+
+        period = int(self.__period[len(self)])
+        input_ = self.input[input_index - period:input_index]
+        up = aroon_up(input_, period)[0]
+        down = aroon_down(input_, period)[0]
+
+        self._values.append(up - down)
+
 def aroon_up(input_, period):
     return AroonUp(input_, period)[:]
 
