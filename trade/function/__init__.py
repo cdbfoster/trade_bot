@@ -16,6 +16,12 @@
 class Function:
     def __init__(self):
         self._values = []
+
+        if 'input' in dir(self) and not isinstance(self.input, Function):
+            new_input = Function()
+            new_input._values = self.input[:]
+            self.input = new_input
+
         self._update()
 
     def __len__(self):
@@ -51,7 +57,7 @@ class Function:
         self._next()
 
     def _next(self):
-        pass
+        raise StopIteration
 
     def _update(self):
         self.__ensure_index(-1)
