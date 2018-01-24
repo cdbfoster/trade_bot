@@ -26,6 +26,8 @@ class ChangePeriod(Function):
         Function.__init__(self)
 
     def _next(self):
+        self.input._update()
+
         input_index = len(self) + self.__range
         if input_index > len(self.input):
             raise StopIteration

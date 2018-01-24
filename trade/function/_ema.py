@@ -26,6 +26,8 @@ class Ema(Function):
         Function.__init__(self)
 
     def _first(self):
+        self.input._update()
+
         if len(self.input) < 2 * self.__period:
             raise StopIteration
 
@@ -36,6 +38,8 @@ class Ema(Function):
         self._values.append((self.input[2 * self.__period - 1] - ema) * self.__weight + ema)
 
     def _next(self):
+        self.input._update()
+
         input_index = len(self) + 2 * self.__period - 1
         if input_index >= len(self.input):
             raise StopIteration

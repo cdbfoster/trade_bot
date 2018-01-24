@@ -29,7 +29,7 @@ class Rsi(Function):
         Function.__init__(self)
 
     def _first(self):
-        _ = self.__difference[-1:]
+        self.__difference._update()
 
         if len(self.__difference) < 2 * self.__period:
             raise StopIteration

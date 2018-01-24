@@ -23,6 +23,8 @@ class AroonUp(Function):
         Function.__init__(self)
 
     def _next(self):
+        self.input._update()
+
         input_index = len(self) + self.__period - 1
         if input_index >= len(self.input):
             raise StopIteration
@@ -42,6 +44,8 @@ class AroonDown(Function):
         Function.__init__(self)
 
     def _next(self):
+        self.input._update()
+
         input_index = len(self) + self.__period - 1
         if input_index >= len(self.input):
             raise StopIteration
