@@ -30,7 +30,7 @@ class MacdSignalCrossover(Indicator):
         Indicator.__init__(self)
 
     def _next(self):
-        self.__macd_histogram._exhaust_input()
+        self.__macd_histogram._update()
 
         if len(self.__macd_histogram) < 2 or len(self) == len(self.__macd_histogram) - 1:
             raise StopIteration

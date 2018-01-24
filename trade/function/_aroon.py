@@ -64,8 +64,8 @@ class AroonOscillator(Function):
         Function.__init__(self)
 
     def _next(self):
-        self.__up._exhaust_input()
-        self.__down._exhaust_input()
+        self.__up._update()
+        self.__down._update()
 
         if len(self.__up) == 0 or len(self) == len(self.__up):
             raise StopIteration

@@ -16,7 +16,7 @@
 class Function:
     def __init__(self):
         self._values = []
-        self._exhaust_input()
+        self._update()
 
     def __len__(self):
         return len(self._values)
@@ -53,7 +53,7 @@ class Function:
     def _next(self):
         pass
 
-    def _exhaust_input(self):
+    def _update(self):
         self.__ensure_index(-1)
 
     def __ensure_index(self, index):
@@ -82,7 +82,7 @@ class Function:
             self.function = function
             self.position = 0
 
-            self.function._exhaust_input()
+            self.function._update()
 
         def __next__(self):
             if self.position < len(self.function):

@@ -28,8 +28,8 @@ class Macd(Function):
         Function.__init__(self)
 
     def _next(self):
-        self.__short._exhaust_input()
-        self.__long._exhaust_input()
+        self.__short._update()
+        self.__long._update()
 
         if len(self.__long) == 0 or len(self) == len(self.__long):
             raise StopIteration
@@ -47,8 +47,8 @@ class MacdHistogram(Function):
         Function.__init__(self)
 
     def _next(self):
-        self.__macd._exhaust_input()
-        self.__macd_signal._exhaust_input()
+        self.__macd._update()
+        self.__macd_signal._update()
 
         if len(self.__macd_signal) == 0 or len(self) == len(self.__macd_signal):
             raise StopIteration

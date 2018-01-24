@@ -30,7 +30,7 @@ class AroonOscillator(Indicator):
         Indicator.__init__(self)
 
     def _next(self):
-        self.__aroon_oscillator._exhaust_input()
+        self.__aroon_oscillator._update()
 
         if len(self.__aroon_oscillator) < 2 or len(self) == len(self.__aroon_oscillator) - 1:
             raise StopIteration

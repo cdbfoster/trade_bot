@@ -27,7 +27,7 @@ class Rsi(Indicator):
         Indicator.__init__(self)
 
     def _next(self):
-        self.__rsi._exhaust_input()
+        self.__rsi._update()
 
         if len(self.__rsi) == 0 or len(self) == len(self.__rsi):
             raise StopIteration

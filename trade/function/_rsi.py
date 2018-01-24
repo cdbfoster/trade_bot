@@ -44,7 +44,7 @@ class Rsi(Function):
         self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss)) # XXX We'll need some kind of zero division protection
 
     def _next(self):
-        self.__difference._exhaust_input()
+        self.__difference._update()
 
         input_index = len(self) + 2 * self.__period - 1
         if input_index >= len(self.__difference):
