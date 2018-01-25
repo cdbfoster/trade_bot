@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import numpy as np
 
-from trade.indicator import Signal
+from trade.indicator import Indicator, Signal
 
 class Grapher:
     class _Plot:
@@ -46,7 +46,16 @@ class Grapher:
             plt.minorticks_on()
 
             for i, range_ in enumerate(self.ranges):
-                plt.plot(self.time[len(self.time) - len(range_):], range_, Grapher._Plot.colors[i % len(Grapher._Plot.colors)] + '-')
+                if not isinstance(range_, Indicator):
+                    plt.plot(self.time[len(self.time) - len(range_):], range_, Grapher._Plot.colors[i % len(Grapher._Plot.colors)] + '-')
+                elif not isinstance(self.ranges[0], Indicator):
+                    buy_time = [self.time[len(self.time) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.BUY]
+                    buy_price = [self.ranges[0][len(self.ranges[0]) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.BUY]
+                    plt.plot(buy_time, buy_price, "g^")
+
+                    sell_time = [self.time[len(self.time) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.SELL]
+                    sell_price = [self.ranges[0][len(self.ranges[0]) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.SELL]
+                    plt.plot(sell_time, sell_price, "rv")
 
 
     def __init__(self, *args, major_interval=None, minor_count=None):
@@ -64,7 +73,7 @@ class Grapher:
                 # This is a new timeline
                 current_time = arg[:]
             else:
-                plots.append(Grapher._Plot(current_time, [range_[:] for range_ in arg]))
+                plots.append(Grapher._Plot(current_time, [range_[:] if not isinstance(range_, Indicator) else range_ for range_ in arg]))
 
         for i, plot in enumerate(plots):
             if len(plots) > 1:
