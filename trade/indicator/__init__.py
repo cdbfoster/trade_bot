@@ -32,7 +32,7 @@ class Indicator(Function):
     def _next(self):
         pass
 
-from ._aroon_oscillator import AroonOscillator
+from ._aroon_oscillator import AroonOscillator, PeriodAdjustedAroonOscillator
 from ._ema_crossover import EmaCrossover
 from ._macd_signal_crossover import MacdSignalCrossover
 from ._rsi import Rsi
