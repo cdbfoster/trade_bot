@@ -25,7 +25,6 @@ class AroonOscillator(Indicator):
 
         self.__aroon_oscillator = AroonOscillatorFunction(self.input, self.__period)
         self.__last_spike = None
-        self.__threshold = 100 - 100 / self.__period
 
         Indicator.__init__(self)
 
@@ -38,7 +37,7 @@ class AroonOscillator(Indicator):
         last_aro = self.__aroon_oscillator[len(self)]
         this_aro = self.__aroon_oscillator[len(self) + 1]
 
-        if abs(last_aro) >= self.__threshold:
+        if abs(last_aro) > 99.9:
             self.__last_spike = Signal.SELL if math.copysign(1, last_aro) > 0 else Signal.BUY
 
         if math.copysign(1, last_aro) != math.copysign(1, this_aro) and self.__last_spike is not None:

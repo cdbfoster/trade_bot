@@ -25,12 +25,12 @@ class AroonUp(Function):
     def _next(self):
         self.input._update()
 
-        input_index = len(self) + self.__period - 1
+        input_index = len(self) + self.__period
         if input_index >= len(self.input):
             raise StopIteration
 
         high = (None, None)
-        for i in range(len(self), len(self) + self.__period):
+        for i in range(len(self), len(self) + self.__period + 1):
             if high[0] is not None and self.input[i] > high[0] or high[0] is None:
                 high = (self.input[i], len(self) + self.__period - i)
 
@@ -46,12 +46,12 @@ class AroonDown(Function):
     def _next(self):
         self.input._update()
 
-        input_index = len(self) + self.__period - 1
+        input_index = len(self) + self.__period
         if input_index >= len(self.input):
             raise StopIteration
 
         low = (None, None)
-        for i in range(len(self), len(self) + self.__period):
+        for i in range(len(self), len(self) + self.__period + 1):
             if low[0] is not None and self.input[i] < low[0] or low[0] is None:
                 low = (self.input[i], len(self) + self.__period - i)
 
@@ -89,11 +89,11 @@ class PeriodAdjustedAroonOscillator(Function):
         self.input._update()
 
         input_index = len(self) + self.__max_period
-        if len(self) >= len(self.__period)  or input_index > len(self.input):
+        if len(self) >= len(self.__period)  or input_index >= len(self.input):
             raise StopIteration
 
         period = int(self.__period[len(self)])
-        input_ = self.input[input_index - period:input_index]
+        input_ = self.input[input_index - period - 1:input_index]
         up = aroon_up(input_, period)[0]
         down = aroon_down(input_, period)[0]
 
