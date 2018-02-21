@@ -16,8 +16,9 @@
 class Investor:
     def __init__(self, market):
         self.market = market
+        self.orders = []
 
-    def tick(self):
+    def update(self):
         pass
 
 from ._single_indicator import SingleIndicator

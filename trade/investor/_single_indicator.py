@@ -33,10 +33,15 @@ class SingleIndicator(Investor):
         self.last_action_price = None
         self.campaigns = []
 
-    def tick(self):
-        signal = self.indicator[-1]
+    def update(self):
+        signal = None
+        try:
+            signal = self.indicator[-1]
+        except ValueError:
+            return
 
-        if signal is None or signal == Signal.HOLD:
+        if signal == Signal.HOLD:
+            self.orders.append(Signal.HOLD)
             return
 
         last_price = self.market.get_last_price()
@@ -53,11 +58,14 @@ class SingleIndicator(Investor):
                 old_balance = self.market.balance.copy()
                 old_value = self.market.get_portfolio_value()
                 self.market.place_order(OrderSide.SELL, OrderType.MARKET, campaign[1])
+                self.orders.append(Signal.SELL)
 
                 self.last_action_price = last_price
 
                 if self.debug is not None:
                     self.debug.write("SELL - Price: {:.2f}, Before: {}, Value: {:.2f}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, old_value, self.market.balance, self.market.get_portfolio_value()))
+            else:
+                self.orders.append(Signal.HOLD)
 
         elif signal == Signal.BUY and self.market.balance[self.market.base_currency] > 0 and len(self.campaigns) < self.maximum_campaigns:
             top = max(last_price, self.last_action_price)  * (1 - self.sim_trade_loss) * (1 - self.sim_transaction_fee) if self.last_action_price is not None else None
@@ -82,11 +90,16 @@ class SingleIndicator(Investor):
                 old_balance = self.market.balance.copy()
                 old_value = self.market.get_portfolio_value()
                 self.market.place_order(OrderSide.BUY, OrderType.MARKET, investment)
+                self.orders.append(Signal.BUY)
                 self.campaigns.append((investment, self.market.balance[self.market.exchange_currency] - old_balance[self.market.exchange_currency], last_price))
 
                 self.last_action_price = last_price
 
                 if self.debug is not None:
                     self.debug.write("BUY - Price: {:.2f}, Before: {}, Value: {:.2f}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, old_value, self.market.balance, self.market.get_portfolio_value()))
+            else:
+                self.orders.append(Signal.HOLD)
+        else:
+            self.orders.append(Signal.HOLD)
 
         self.last_signal = signal
