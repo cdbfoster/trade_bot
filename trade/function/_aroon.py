@@ -30,9 +30,9 @@ class AroonUp(Function):
             raise StopIteration
 
         high = (None, None)
-        for i in range(len(self), len(self) + self.__period + 1):
+        for i in range(input_index - self.__period, input_index + 1):
             if high[0] is not None and self.input[i] > high[0] or high[0] is None:
-                high = (self.input[i], len(self) + self.__period - i)
+                high = (self.input[i], input_index - i)
 
         self._values.append(100 * (self.__period - high[1]) / self.__period)
 
@@ -51,9 +51,9 @@ class AroonDown(Function):
             raise StopIteration
 
         low = (None, None)
-        for i in range(len(self), len(self) + self.__period + 1):
+        for i in range(input_index - self.__period, input_index + 1):
             if low[0] is not None and self.input[i] < low[0] or low[0] is None:
-                low = (self.input[i], len(self) + self.__period - i)
+                low = (self.input[i], input_index - i)
 
         self._values.append(100 * (self.__period - low[1]) / self.__period)
 
@@ -88,16 +88,21 @@ class PeriodAdjustedAroonOscillator(Function):
         self.__period._update()
         self.input._update()
 
-        input_index = len(self) + self.__max_period
-        if len(self) >= len(self.__period)  or input_index >= len(self.input):
+        aroon_range = max(len(self.input) - self.__max_period, 0)
+        period_range = len(self.__period)
+
+        if len(self) == min(aroon_range, period_range):
             raise StopIteration
 
-        period = int(self.__period[len(self)])
-        input_ = self.input[input_index - period - 1:input_index]
-        up = aroon_up(input_, period)[0]
-        down = aroon_down(input_, period)[0]
+        period_index = len(self) + max(period_range - aroon_range, 0)
+        input_index = len(self) + self.__max_period + max(aroon_range - period_range, 0)
 
-        self._values.append(up - down)
+        period = int(self.__period[period_index])
+        input_ = self.input[input_index - period:input_index + 1]
+
+        oscillator = aroon_oscillator(input_, period)[0]
+
+        self._values.append(oscillator)
 
 def aroon_up(input_, period):
     return AroonUp(input_, period)[:]
