@@ -21,7 +21,7 @@ from trade.indicator import Indicator, Signal
 
 class Grapher:
     class _Plot:
-        colors = ['', 'b', 'g', 'r', 'c', 'm', 'y']
+        colors = ['', 'g', 'r', 'c', 'm', 'y', 'b']
 
         def __init__(self, time, ranges):
             self.time = time
