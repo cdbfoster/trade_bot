@@ -41,7 +41,7 @@ class GeminiMarket(Function, Market):
     def _next(self):
         raise StopIteration
 
-    def tick(self):
+    def update(self):
         last_trade_price = self.__public_listener.last_trade_price
         if last_trade_price is not None:
             self._values.append(last_trade_price)

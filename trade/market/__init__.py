@@ -36,6 +36,23 @@ class Market:
             base_currency: 0.0,
         }
 
+        self.balance_history = {
+            exchange_currency: [],
+            base_currency: [],
+            exchange_currency + "_total": [],
+            base_currency + "_total": [],
+        }
+
+    def record_balance(self):
+        last_price = self.get_last_price()
+        exchange = self.balance[self.exchange_currency]
+        base = self.balance[self.base_currency]
+
+        self.balance_history[self.exchange_currency].append(exchange)
+        self.balance_history[self.base_currency].append(base)
+        self.balance_history[self.exchange_currency + "_total"].append(exchange + base / last_price)
+        self.balance_history[self.base_currency + "_total"].append(base + exchange * last_price)
+
     def place_order(self, order_side, order_type, amount, cancel_existing=True):
         pass
 
