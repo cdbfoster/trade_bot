@@ -46,7 +46,7 @@ class Grapher:
             plt.minorticks_on()
 
             for i, range_ in enumerate(self.ranges):
-                if not isinstance(range_, Indicator):
+                if len(range_) > 0 and not isinstance(range_[0], Signal):
                     plt.plot(self.time[len(self.time) - len(range_):], range_, Grapher._Plot.colors[i % len(Grapher._Plot.colors)] + '-')
                 elif not isinstance(self.ranges[0], Indicator):
                     buy_time = [self.time[len(self.time) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.BUY]
