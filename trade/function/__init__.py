@@ -103,3 +103,4 @@ from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
 from ._rsi import Rsi, rsi
+from ._zero_lag_ma import ZeroLagMa, zero_lag_ma
