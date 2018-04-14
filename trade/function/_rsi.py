@@ -15,43 +15,43 @@
 
 import numpy as np
 
-from trade.function import Function, Difference
+from trade.function import Function, Slope
 
 class Rsi(Function):
     def __init__(self, input_, period):
         self.input = input_
         self.__period = period
 
-        self.__difference = Difference(input_)
+        self.__slope = Slope(input_)
         self.__average_gain = None
         self.__average_loss = None
 
         Function.__init__(self)
 
     def _first(self):
-        self.__difference._update()
+        self.__slope._update()
 
-        if len(self.__difference) < 2 * self.__period:
+        if len(self.__slope) < 2 * self.__period:
             raise StopIteration
 
-        self.__average_gain = np.mean([max(d, 0) for d in self.__difference[:self.__period]])
-        self.__average_loss = np.mean([min(d, 0) for d in self.__difference[:self.__period]])
+        self.__average_gain = np.mean([max(d, 0) for d in self.__slope[:self.__period]])
+        self.__average_loss = np.mean([min(d, 0) for d in self.__slope[:self.__period]])
 
-        for d in self.__difference[self.__period:2 * self.__period]:
+        for d in self.__slope[self.__period:2 * self.__period]:
             self.__average_gain = (self.__average_gain * (self.__period - 1) + max(d, 0)) / self.__period
             self.__average_loss = (self.__average_loss * (self.__period - 1) + min(d, 0)) / self.__period
 
         self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss)) # XXX We'll need some kind of zero division protection
 
     def _next(self):
-        self.__difference._update()
+        self.__slope._update()
 
         input_index = len(self) + 2 * self.__period - 1
-        if input_index >= len(self.__difference):
+        if input_index >= len(self.__slope):
             raise StopIteration
 
-        self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__difference[input_index], 0)) / self.__period
-        self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__difference[input_index], 0)) / self.__period
+        self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__slope[input_index], 0)) / self.__period
+        self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__slope[input_index], 0)) / self.__period
 
         self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss))
 

@@ -98,8 +98,8 @@ class Function:
 
 from ._aroon import AroonUp, AroonDown, AroonOscillator, PeriodAdjustedAroonOscillator, aroon_up, aroon_down, aroon_oscillator
 from ._change_period import ChangePeriod, change_period
-from ._difference import Difference, difference
 from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
+from ._slope import Slope, slope # Needed by Rsi
 from ._rsi import Rsi, rsi

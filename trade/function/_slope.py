@@ -15,7 +15,7 @@
 
 from trade.function import Function
 
-class Difference(Function):
+class Slope(Function):
     def __init__(self, input_):
         self.input = input_
 
@@ -30,5 +30,5 @@ class Difference(Function):
 
         self._values.append(self.input[input_index] - self.input[input_index - 1])
 
-def difference(input_):
-    return Difference(input_)[:]
+def slope(input_):
+    return Slope(input_)[:]
