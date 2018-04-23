@@ -50,3 +50,6 @@ class EhlersWayBandpass(Function):
             raise StopIteration
 
         self._values.append(0.5 * (1 - self.__alpha) * (self.input[input_index] - self.input[input_index - 2]) + self.__beta * (1 + self.__alpha) * self._values[-1] - self.__alpha * self._values[-2])
+
+def ehlers_way_bandpass(input_, period, delta):
+    return EhlersWayBandpass(input_, period, delta)[:]
