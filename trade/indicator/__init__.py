@@ -33,6 +33,8 @@ class Indicator(Function):
         pass
 
 from ._aroon_oscillator import AroonOscillator, PeriodAdjustedAroonOscillator
+from ._crossover import Crossover
 from ._ema_crossover import EmaCrossover
 from ._macd_signal_crossover import MacdSignalCrossover
+from ._min_max import MinMax
 from ._rsi import Rsi
