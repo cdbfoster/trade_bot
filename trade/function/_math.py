@@ -27,11 +27,14 @@ class Add(Function):
         self.input1._update()
         self.input2._update()
 
+        input1_shift = max(len(self.input1) - len(self.input2), 0)
+        input2_shift = max(len(self.input2) - len(self.input1), 0)
+
         input_index = len(self)
-        if input_index >= len(self.input1) or input_index >= len(self.input2):
+        if input_index + input1_shift >= len(self.input1) or input_index + input2_shift >= len(self.input2):
             raise StopIteration
 
-        self._values.append(self.input1[input_index] + self.input2[input_index])
+        self._values.append(self.input1[input_index + input1_shift] + self.input2[input_index + input2_shift])
 
 class Divide(Function):
     def __init__(self, input1, input2):
@@ -45,11 +48,14 @@ class Divide(Function):
         self.input1._update()
         self.input2._update()
 
+        input1_shift = max(len(self.input1) - len(self.input2), 0)
+        input2_shift = max(len(self.input2) - len(self.input1), 0)
+
         input_index = len(self)
-        if input_index >= len(self.input1) or input_index >= len(self.input2):
+        if input_index + input1_shift >= len(self.input1) or input_index + input2_shift >= len(self.input2):
             raise StopIteration
 
-        self._values.append(self.input1[input_index] / (self.input2[input_index1] if self.input2[input_index] != 0.0 else 0.00000001))
+        self._values.append(self.input1[input_index + input1_shift] / (self.input2[input_index + input2_shift] if self.input2[input_index + input2_shift] != 0.0 else 0.00000001))
 
 class Multiply(Function):
     def __init__(self, input1, input2):
@@ -63,11 +69,14 @@ class Multiply(Function):
         self.input1._update()
         self.input2._update()
 
+        input1_shift = max(len(self.input1) - len(self.input2), 0)
+        input2_shift = max(len(self.input2) - len(self.input1), 0)
+
         input_index = len(self)
-        if input_index >= len(self.input1) or input_index >= len(self.input2):
+        if input_index + input1_shift >= len(self.input1) or input_index + input2_shift >= len(self.input2):
             raise StopIteration
 
-        self._values.append(self.input1[input_index] * self.input2[input_index])
+        self._values.append(self.input1[input_index + input1_shift] * self.input2[input_index + input2_shift])
 
 class Offset(Function):
     def __init__(self, input_, value):
