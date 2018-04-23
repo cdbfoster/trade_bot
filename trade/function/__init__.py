@@ -105,3 +105,4 @@ from ._macd import Macd, MacdHistogram, macd, macd_histogram
 from ._math import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
 from ._slope import Slope, slope # Needed by Rsi
 from ._rsi import Rsi, rsi
+from ._z_score import ZScore, z_score
