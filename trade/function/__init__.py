@@ -102,5 +102,6 @@ from ._ehlers_way_bandpass import EhlersWayBandpass
 from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
+from ._math import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
 from ._slope import Slope, slope # Needed by Rsi
 from ._rsi import Rsi, rsi
