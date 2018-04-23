@@ -96,13 +96,13 @@ class Function:
                 return self.function[self.position - 1]
             raise StopIteration
 
+from ._arithmetic import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
 from ._aroon import AroonUp, AroonDown, AroonOscillator, PeriodAdjustedAroonOscillator, aroon_up, aroon_down, aroon_oscillator
 from ._change_period import ChangePeriod, change_period
 from ._ehlers_way_bandpass import EhlersWayBandpass, ehlers_way_bandpass
 from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
-from ._math import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
 from ._slope import Slope, slope # Needed by Rsi
 from ._standard_deviation import StandardDeviation, standard_deviation
 from ._rsi import Rsi, rsi
