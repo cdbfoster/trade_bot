@@ -44,10 +44,12 @@ class HistoricalMarket(Market, HistoricalInput):
         if order_side == OrderSide.BUY and self.balance[self.base_currency] >= base_amount:
             self.balance[self.base_currency] -= base_amount
             self.balance[self.exchange_currency] += exchange_amount
+            print("{} - Price: {:.2f}, Value: {}".format(order_side.name, self.get_last_price(), self.get_portfolio_value()))
             return True
         elif order_side == OrderSide.SELL and self.balance[self.exchange_currency] >= exchange_amount:
             self.balance[self.exchange_currency] -= exchange_amount
             self.balance[self.base_currency] += base_amount
+            print("{} - Price: {:.2f}, Value: {}".format(order_side.name, self.get_last_price(), self.get_portfolio_value()))
             return True
         else:
             return False
