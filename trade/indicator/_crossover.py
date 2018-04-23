@@ -23,7 +23,7 @@ class Crossover(Indicator):
         self.input = input1 if input2 is None else Subtract(input1, input2)
         self.input1 = input1
         self.input2 = input2
-        self._continuous = continuous
+        self.__continuous = continuous
 
         Indicator.__init__(self)
 
