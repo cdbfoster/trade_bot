@@ -103,7 +103,7 @@ from ._ehlers_way_bandpass import EhlersWayBandpass, ehlers_way_bandpass
 from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
-from ._slope import Slope, slope # Needed by Rsi
-from ._rsi import Rsi, rsi
+from ._slope import Slope, slope
+from ._rsi import Rsi, rsi # Needs Slope
 from ._standard_deviation import StandardDeviation, standard_deviation
 from ._z_score import ZScore, z_score
