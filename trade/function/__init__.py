@@ -106,4 +106,5 @@ from ._macd import Macd, MacdHistogram, macd, macd_histogram
 from ._slope import Slope, slope
 from ._rsi import Rsi, rsi # Needs Slope
 from ._standard_deviation import StandardDeviation, standard_deviation
+from ._dominant_band import DominantBand, dominant_band # Needs EhlersWayBandpass, StandardDeviation
 from ._z_score import ZScore, z_score
