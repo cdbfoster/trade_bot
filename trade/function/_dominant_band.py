@@ -50,9 +50,6 @@ class DominantBand(Function):
         else:
             value = self.__band_periods[np.argmax(std_devs)]
 
-        if len(self) == 10:
-            print(value)
-
         self._values.append(value)
 
 def dominant_band(input_, std_dev_period, band_min, band_max, band_count, interpolate):
