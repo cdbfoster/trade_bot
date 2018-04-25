@@ -98,6 +98,7 @@ class Function:
 
 from ._arithmetic import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
 from ._aroon import AroonUp, AroonDown, AroonOscillator, PeriodAdjustedAroonOscillator, aroon_up, aroon_down, aroon_oscillator
+from ._atr import Atr, atr
 from ._change_period import ChangePeriod, change_period
 from ._ehlers_way_bandpass import EhlersWayBandpass, ehlers_way_bandpass
 from ._ema import Ema, ema
