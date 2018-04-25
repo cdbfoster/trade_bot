@@ -22,7 +22,24 @@ class StandardDeviation(Function):
         self.input = input_
         self.__period = period
 
+        self.__mean = 0.0
+        self.__error_sum = 0.0
+        self.__variance = 0.0
+
         Function.__init__(self)
+
+    def _first(self):
+        self.input._update()
+
+        if len(self.input) < self.__period:
+            raise StopIteration
+
+        input_ = np.array(self.input[:self.__period])
+        self.__mean = np.mean(input_)
+        self.__error_sum = np.sum((input_ - self.__mean) ** 2)
+        self.__variance = self.__error_sum / self.__period
+
+        self._values.append(np.sqrt(self.__variance))
 
     def _next(self):
         self.input._update()
@@ -31,8 +48,21 @@ class StandardDeviation(Function):
         if input_index >= len(self.input):
             raise StopIteration
 
-        input_ = self.input[input_index - self.__period + 1:input_index + 1]
-        self._values.append(np.std(input_))
+        value_discard = self.input[len(self) - 1]
+        value_new = self.input[input_index]
+
+        delta_new_discard = value_new - value_discard
+        delta_discard_mean = value_discard - self.__mean
+
+        delta_new_mean_before = value_new - self.__mean
+        self.__mean += delta_new_discard / self.__period
+        delta_new_mean_after = value_new - self.__mean
+
+        self.__error_sum -= ((delta_discard_mean * delta_discard_mean - delta_new_mean_before * delta_new_mean_after) * self.__period +
+            delta_new_discard * delta_new_mean_after) / (self.__period - 1)
+        self.__variance = abs(self.__error_sum / self.__period)
+
+        self._values.append(np.sqrt(self.__variance))
 
 def standard_deviation(input_, period):
     return StandardDeviation(input_, period)[:]
