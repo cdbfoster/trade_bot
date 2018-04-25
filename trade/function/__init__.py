@@ -106,6 +106,7 @@ from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
 from ._pooling import Close, High, Low, Open
 from ._skip import Skip
+from ._chandelier_exit import ChandelierExitLong # Needs Atr, High, Low, Skip
 from ._slope import Slope, slope
 from ._rsi import Rsi, rsi # Needs Slope
 from ._standard_deviation import StandardDeviation, standard_deviation
