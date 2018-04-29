@@ -91,14 +91,15 @@ class SingleIndicator(Investor):
                     self.debug.write("BUY - Price: {:.2f}, Before: {}, Value: {:.2f}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, old_value, self.market.balance, self.market.get_portfolio_value()))
 
         if signal == Signal.SELL and self.market.balance[self.market.exchange_currency] > 0 and len(self.investments) > 0:
-            max_return = max([(return_value(last_price, self.sim_trade_loss, self.sim_transaction_fee, investment.amount / investment.actual_purchase), investment) for investment in self.investments])
+            returns = [(return_value(last_price, self.sim_trade_loss, self.sim_transaction_fee, investment.amount / investment.actual_purchase), investment) for investment in self.investments]
 
-            if max_return[0] > 0:
-                self.investments.remove(max_return[1])
-                old_balance = self.market.balance.copy()
-                old_value = self.market.get_portfolio_value()
-                self.market.place_order(OrderSide.SELL, OrderType.MARKET, max_return[1].actual_purchase)
-                self.orders[-1] = Signal.SELL
+            for return_ in returns:
+                if return_[0] > 0:
+                    self.investments.remove(return_[1])
+                    old_balance = self.market.balance.copy()
+                    old_value = self.market.get_portfolio_value()
+                    self.market.place_order(OrderSide.SELL, OrderType.MARKET, return_[1].actual_purchase)
+                    self.orders[-1] = Signal.SELL
 
                 if self.debug is not None:
                     self.debug.write("SELL - Price: {:.2f}, Before: {}, Value: {:.2f}, After: {}, Value: {:.2f}\n".format(last_price, old_balance, old_value, self.market.balance, self.market.get_portfolio_value()))
