@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Atr, High, Low, Skip
+from trade.function import Atr, Function, High, Low, Skip
 
 class ChandelierExitLong(Function):
     def __init__(self, input_, pooling_period, period_count, multiplier):
@@ -28,7 +28,7 @@ class ChandelierExitLong(Function):
         Function.__init__(self)
 
     def _next(self):
-        self.__high._upate()
+        self.__high._update()
         self.__atr._update()
 
         if len(self) >= len(self.__atr):
@@ -38,3 +38,27 @@ class ChandelierExitLong(Function):
 
         period_high = max(self.__high.highs[current_period:current_period + self.__period_count])
         self._values.append(period_high - self.__atr.atrs[current_period] * self.__multiplier)
+
+class ChandelierExitShort(Function):
+    def __init__(self, input_, pooling_period, period_count, multiplier):
+        self.input = input_
+        self.__pooling_period = pooling_period
+        self.__period_count = period_count
+        self.__multiplier = multiplier
+
+        self.__low = Low(Skip(self.input, 1), self.__pooling_period)
+        self.__atr = Atr(self.input, self.__pooling_period, self.__period_count)
+
+        Function.__init__(self)
+
+    def _next(self):
+        self.__low._update()
+        self.__atr._update()
+
+        if len(self) >= len(self.__atr):
+            raise StopIteration
+
+        current_period = len(self) // self.__pooling_period
+
+        period_low = min(self.__low.lows[current_period:current_period + self.__period_count])
+        self._values.append(period_low + self.__atr.atrs[current_period] * self.__multiplier)
