@@ -24,15 +24,16 @@ class SingleIndicator(Investor):
             self.amount = amount
             self.actual_purchase = actual_purchase
             self.price = price
+            self.max_since = amount
 
-    def __init__(self, market, indicator, maximum_trade=None, stop_loss=0.05, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_investments=1, debug=None):
+    def __init__(self, market, indicator, maximum_trade=None, trailing_stop_loss=0.15, sim_trade_loss=0.001, sim_transaction_fee=0.0025, maximum_investments=1, debug=None):
         Investor.__init__(self, market)
 
         self.debug = debug
 
         self.indicator = indicator
         self.maximum_trade = maximum_trade
-        self.stop_loss = stop_loss
+        self.trailing_stop_loss = trailing_stop_loss
         self.sim_trade_loss = sim_trade_loss
         self.sim_transaction_fee = sim_transaction_fee
         self.maximum_investments = maximum_investments
@@ -45,7 +46,9 @@ class SingleIndicator(Investor):
 
         # Check stop-losses
         for investment in self.investments[:]:
-            if last_price < investment.price * (1.0 - self.stop_loss):
+            investment.max_since = max(last_price, investment.max_since)
+            if last_price < investment.max_since * (1.0 - self.trailing_stop_loss):
+                print("{} is less than {}% below {}.  Stop-loss triggered.".format(last_price, self.trailing_stop_loss * 100, investment.max_since))
                 self.market.place_order(OrderSide.SELL, OrderType.MARKET, investment.actual_purchase)
                 self.investments.remove(investment)
                 self.orders[-1] = Signal.SELL
