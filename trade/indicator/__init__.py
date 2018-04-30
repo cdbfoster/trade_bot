@@ -35,3 +35,4 @@ class Indicator(Function):
 from ._crossover import Crossover
 from ._logic import And, Not, Or
 from ._min_max import MinMax
+from ._threshold import Threshold
