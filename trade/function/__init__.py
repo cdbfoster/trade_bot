@@ -15,14 +15,8 @@
 
 class Function:
     def __init__(self):
+        self.inputs = FunctionInputs()
         self._values = []
-
-        if 'input' in dir(self) and not isinstance(self.input, Function):
-            new_input = Function()
-            new_input._values = self.input[:]
-            self.input = new_input
-
-        self._update()
 
     def __len__(self):
         return len(self._values)
@@ -60,6 +54,7 @@ class Function:
         raise StopIteration
 
     def _update(self):
+        self.inputs.update()
         self.__ensure_index(-1)
 
     def __ensure_index(self, index):
@@ -72,11 +67,19 @@ class Function:
             except StopIteration:
                 break
 
-    def save(self, filename, mode='w', save_input=False):
+    def save(self, filename, mode='w', save_inputs=False):
         f = open(filename, mode)
+
+        if save_inputs:
+            f.write("# ")
+            for input_ in self.inputs:
+                f.write("{} ".format(input_.name))
+            f.write("value\n")
+
         for i, x in enumerate(self):
-            if save_input and 'input' in dir(self):
-                f.write("{} ".format(self.input[i - len(self)]))
+            if save_inputs:
+                for input_ in self.inputs:
+                    f.write("{} ".format(input_[i - len(self)]))
             f.write("{}\n".format(x))
         f.close()
 
@@ -95,6 +98,132 @@ class Function:
                 self.position += 1
                 return self.function[self.position - 1]
             raise StopIteration
+
+class FunctionInputs(set):
+    def __init__(self):
+        set.__init__(self)
+
+    def sync_to_min_length(self, sync_offset=-1):
+        lengths = [len(core) for core in [i._FunctionInput__core for i in self if hasattr(i._FunctionInput__core, "__len__")]]
+        min_length = min(lengths) if len(lengths) > 0 else 0
+
+        for i in self:
+            offset = len(i) - min_length - i.consumed + sync_offset
+            if offset > 0:
+                i.consume(offset)
+
+    def sync_to_input_index(self, input_, index, sync_offset=-1):
+        if input_ is not None:
+            input_length = len(input_)
+        else:
+            lengths = [len(core) for core in [i.__core for i in self if hasattr(i.__core, "__len__")]]
+            input_length = max(lengths) if len(lengths) > 0 else 0
+
+        for i in self:
+            offset = len(i) - input_length + index - i.consumed + sync_offset
+            if offset > 0:
+                i.consume(offset)
+
+    def update(self):
+        for i in self:
+            i.update()
+
+class FunctionInput:
+    def __init__(self):
+        self.name = None
+        self.__core = None
+        self.__consumed = 0
+        self.__function = None
+
+    def consume(self, count=1):
+        if not isinstance(count, int) or count <= 0:
+            raise ValueError("must consume a positive integer greater than zero")
+
+        if self.__consumed + count > len(self):
+            raise ValueError("consumed past the end of the function input")
+
+        if count == 1:
+            self.__consumed += 1
+            return self[self.__consumed - 1]
+        else:
+            values = slice(self.__consumed, self.__consumed + count)
+            self.__consumed += count
+            return self[values]
+
+    @property
+    def consumed(self):
+        return self.__consumed
+
+    @property
+    def max(self):
+        if hasattr(self, "_FunctionInput__max"):
+            return self.__max
+        elif isinstance(self.__core, int) or isinstance(self.__core, float):
+            return self.__core
+        else:
+            raise AttributeError("'FunctionInput' object has no attribute 'max'")
+
+    def update(self):
+        if isinstance(self.__core, Function2):
+            self.__core._update()
+
+    def __set_name__(self, owner, name):
+        print("Here: ", name)
+        self.name = name
+
+    def __set__(self, instance, value):
+        if isinstance(instance, Function2):
+            instance.inputs.add(self)
+            self.__function = instance
+
+        print(value)
+
+        if isinstance(value, tuple) and len(value) >= 2 and isinstance(value[0], Function2):
+            print("  Here1")
+            self.__core = value[0]
+            self.__max = value[1]
+            print(hasattr(self, "_FunctionInput__max"), self.__max)
+        else:
+            print("  Here2")
+            self.__core = value
+        self.__consumed = 0
+
+    def __len__(self):
+        if hasattr(self.__core, "__len__"):
+            return len(self.__core)
+        elif self.__function is not None:
+            lengths = [len(core) for core in [i.__core for i in self.__function.inputs if hasattr(i.__core, "__len__")]]
+            return min(lengths) if len(lengths) > 0 else len(self.__function) + 1
+        else:
+            return 0
+
+    def __getitem__(self, index):
+        if hasattr(self.__core, "__getitem__"):
+            return self.__core[index]
+        else:
+            length = len(self)
+            if isinstance(index, int):
+                if index >= length or index < -length:
+                    raise ValueError("function input index out of range")
+                else:
+                    return self.__core
+            elif isinstance(index, slice):
+                if index.start is not None and not isinstance(index.start, int):
+                    raise TypeError("slice indices must be integers or None")
+                if index.stop is not None and not isinstance(index.stop, int):
+                    raise TypeError("slice indices must be integers or None")
+
+                start = min(len(self.__function) + index.start + (length if index.start < 0 else 0), length)
+                stop = min(len(self.__function) + index.stop + (length if index.stop < 0 else 0), length)
+                step = index.step if index.step is not None else 1
+                return [self.__core] * len(range(start, stop, step))
+            else:
+                raise TypeError("function input indices must be integers or slices")
+
+    def __get_offset(self):
+        lengths = [len(core) for core in [i.__core for i in self.__function.inputs if hasattr(i.__core, "__len__")]]
+        min_length = min(lengths) if len(lengths) > 0 else 0
+        return len(self) - min_length
 
 from ._arithmetic import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
 from ._aroon import AroonUp, AroonDown, AroonOscillator, PeriodAdjustedAroonOscillator, aroon_up, aroon_down, aroon_oscillator
