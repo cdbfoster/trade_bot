@@ -164,27 +164,24 @@ class FunctionInput:
             raise AttributeError("'FunctionInput' object has no attribute 'max'")
 
     def update(self):
-        if isinstance(self.__core, Function2):
+        if isinstance(self.__core, Function):
             self.__core._update()
 
     def __set_name__(self, owner, name):
-        print("Here: ", name)
         self.name = name
 
     def __set__(self, instance, value):
-        if isinstance(instance, Function2):
+        if isinstance(instance, Function):
             instance.inputs.add(self)
             self.__function = instance
 
         print(value)
 
-        if isinstance(value, tuple) and len(value) >= 2 and isinstance(value[0], Function2):
-            print("  Here1")
+        if isinstance(value, tuple) and len(value) >= 2 and isinstance(value[0], Function):
             self.__core = value[0]
             self.__max = value[1]
             print(hasattr(self, "_FunctionInput__max"), self.__max)
         else:
-            print("  Here2")
             self.__core = value
         self.__consumed = 0
 
