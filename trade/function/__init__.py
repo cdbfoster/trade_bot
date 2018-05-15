@@ -175,12 +175,9 @@ class FunctionInput:
             instance.inputs.add(self)
             self.__function = instance
 
-        print(value)
-
         if isinstance(value, tuple) and len(value) >= 2 and isinstance(value[0], Function):
             self.__core = value[0]
             self.__max = value[1]
-            print(hasattr(self, "_FunctionInput__max"), self.__max)
         else:
             self.__core = value
         self.__consumed = 0
