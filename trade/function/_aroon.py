@@ -13,102 +13,86 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class AroonUp(Function):
+    __input = FunctionInput()
+    __period = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
+        Function.__init__(self)
+        self.__input = input_
         self.__period = period
 
-        Function.__init__(self)
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period
-        if input_index >= len(self.input):
+        if len(self) + self.__period.max >= len(self.__input):
             raise StopIteration
+
+        self.inputs.sync_to_input_index(self.__input, self.__period.max)
+
+        self.__input.consume()
+        period = min(int(self.__period.consume()), self.__period.max)
 
         high = (None, None)
-        for i in range(input_index - self.__period, input_index + 1):
-            if high[0] is not None and self.input[i] > high[0] or high[0] is None:
-                high = (self.input[i], input_index - i)
+        for i in range(self.__input.consumed - period, self.__input.consumed + 1):
+            if high[0] is not None and self.__input[i] > high[0] or high[0] is None:
+                high = (self.__input[i], self.__input.consumed - i)
 
-        self._values.append(100 * (self.__period - high[1]) / self.__period)
+        self._values.append(100 * (period - high[1]) / period)
 
 class AroonDown(Function):
+    __input = FunctionInput()
+    __period = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
+        Function.__init__(self)
+        self.__input = input_
         self.__period = period
 
-        Function.__init__(self)
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period
-        if input_index >= len(self.input):
+        if len(self) + self.__period.max >= len(self.__input):
             raise StopIteration
+
+        self.inputs.sync_to_input_index(self.__input, self.__period.max)
+
+        self.__input.consume()
+        period = min(int(self.__period.consume()), self.__period.max)
 
         low = (None, None)
-        for i in range(input_index - self.__period, input_index + 1):
-            if low[0] is not None and self.input[i] < low[0] or low[0] is None:
-                low = (self.input[i], input_index - i)
+        for i in range(self.__input.consumed - period, self.__input.consumed + 1):
+            if low[0] is not None and self.__input[i] < low[0] or low[0] is None:
+                low = (self.__input[i], self.__input.consumed - i)
 
-        self._values.append(100 * (self.__period - low[1]) / self.__period)
+        self._values.append(100 * (period - low[1]) / period)
 
 class AroonOscillator(Function):
+    __up = FunctionInput()
+    __down = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
-
-        self.__up = AroonUp(self.input, self.__period)
-        self.__down = AroonDown(self.input, self.__period)
-
         Function.__init__(self)
+        self.__up = AroonUp(input_, period)
+        self.__down = AroonDown(input_, period)
+
+        self._update()
 
     def _next(self):
-        self.__up._update()
-        self.__down._update()
+        self.inputs.update()
 
-        if len(self.__up) == 0 or len(self) == len(self.__up):
+        if len(self) >= len(self.__up):
             raise StopIteration
 
-        self._values.append(self.__up[len(self)] - self.__down[len(self)])
+        self.inputs.sync_to_min_length()
 
-class PeriodAdjustedAroonOscillator(Function):
-    def __init__(self, input_, period_function, max_period):
-        self.input = input_
-        self.__period = period_function
-        self.__max_period = max_period
+        up = self.__up.consume()
+        down = self.__down.consume()
 
-        Function.__init__(self)
-
-    def _next(self):
-        self.__period._update()
-        self.input._update()
-
-        aroon_range = max(len(self.input) - self.__max_period, 0)
-        period_range = len(self.__period)
-
-        if len(self) == min(aroon_range, period_range):
-            raise StopIteration
-
-        period_index = len(self) + max(period_range - aroon_range, 0)
-        input_index = len(self) + self.__max_period + max(aroon_range - period_range, 0)
-
-        period = int(self.__period[period_index])
-        input_ = self.input[input_index - period:input_index + 1]
-
-        oscillator = aroon_oscillator(input_, period)[0]
-
-        self._values.append(oscillator)
-
-def aroon_up(input_, period):
-    return AroonUp(input_, period)[:]
-
-def aroon_down(input_, period):
-    return AroonDown(input_, period)[:]
-
-def aroon_oscillator(input_, period):
-    return AroonOscillator(input_, period)[:]
+        self._values.append(up - down)

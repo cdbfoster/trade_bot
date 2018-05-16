@@ -220,7 +220,7 @@ class FunctionInput:
         return len(self) - min_length
 
 from ._arithmetic import Add, Divide, Multiply, Subtract
-from ._aroon import AroonUp, AroonDown, AroonOscillator, PeriodAdjustedAroonOscillator, aroon_up, aroon_down, aroon_oscillator
+from ._aroon import AroonUp, AroonDown, AroonOscillator
 from ._atr import Atr, atr
 from ._change_period import ChangePeriod, change_period
 from ._ehlers_way_bandpass import EhlersWayBandpass, ehlers_way_bandpass
