@@ -102,8 +102,13 @@ class Function:
 class FunctionInputs(set):
     def __init__(self):
         set.__init__(self)
+        self.__synced = False
 
-    def sync_to_min_length(self, sync_offset=-1):
+    def sync_to_min_length(self, sync_offset=-1, resync=False):
+        if self.__synced and not resync:
+            return
+        self.__synced = True
+
         lengths = [len(core) for core in [i._FunctionInput__core for i in self if hasattr(i._FunctionInput__core, "__len__")]]
         min_length = min(lengths) if len(lengths) > 0 else 0
 
@@ -112,7 +117,11 @@ class FunctionInputs(set):
             if offset > 0:
                 i.consume(offset)
 
-    def sync_to_input_index(self, input_, index, sync_offset=-1):
+    def sync_to_input_index(self, input_, index, sync_offset=-1, resync=False):
+        if self.__synced and not resync:
+            return
+        self.__synced = True
+
         if input_ is not None:
             input_length = len(input_)
         else:
