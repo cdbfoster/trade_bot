@@ -219,7 +219,7 @@ class FunctionInput:
         min_length = min(lengths) if len(lengths) > 0 else 0
         return len(self) - min_length
 
-from ._arithmetic import Add, Divide, Multiply, Offset, Scale, Subtract, add, divide, multiply, offset, scale, subtract
+from ._arithmetic import Add, Divide, Multiply, Subtract
 from ._aroon import AroonUp, AroonDown, AroonOscillator, PeriodAdjustedAroonOscillator, aroon_up, aroon_down, aroon_oscillator
 from ._atr import Atr, atr
 from ._change_period import ChangePeriod, change_period
