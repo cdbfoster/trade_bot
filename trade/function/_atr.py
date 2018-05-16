@@ -15,30 +15,39 @@
 
 import numpy as np
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class Atr(Function):
+    __input = FunctionInput()
+    __period_count = FunctionInput()
+
     def __init__(self, input_, pooling_period, period_count):
-        self.input = input_
-        self.__pooling_period = pooling_period
+        Function.__init__(self)
+        self.__input = input_
+        self.__pooling_period = int(pooling_period)
         self.__period_count = period_count
 
         self.__trs = []
         self.atrs = []
 
-        Function.__init__(self)
+        self._update()
 
     def _first(self):
-        self.input._update()
+        self.inputs.update()
 
-        if len(self.input) < self.__pooling_period * self.__period_count + 1:
+        if len(self.__period_count) == 0 or self.__pooling_period * int(self.__period_count.max) + 1 > len(self.__input):
             raise StopIteration
 
-        for period in range(self.__period_count):
-            input_ = self.input[period * self.__pooling_period + 1:(period + 1) * self.__pooling_period + 1]
+        self.inputs.sync_to_input_index(self.__input, self.__pooling_period * int(self.__period_count.max) + 1)
+
+        self.__input.consume()
+        period_count = int(max(min(self.__period_count.consume(), self.__period_count.max), 1))
+
+        for period in range(period_count):
+            input_ = self.__input[1 + period * self.__pooling_period:1 + (period + 1) * self.__pooling_period]
             high = max(input_)
             low = min(input_)
-            close = self.input[period * self.__pooling_period]
+            close = self.__input[period * self.__pooling_period]
 
             self.__trs.append(max(high - low, abs(high - close), abs(low - close)))
 
@@ -46,25 +55,22 @@ class Atr(Function):
         self.atrs.append(self._values[-1])
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__pooling_period * self.__period_count
-        if input_index >= len(self.input):
+        if len(self) + self.__pooling_period * int(self.__period_count.max) + 1 > len(self.__input):
             raise StopIteration
 
-        current_period = len(self) // self.__pooling_period + self.__period_count - 1
+        self.__input.consume()
+        period_count = int(max(min(self.__period_count.consume(), self.__period_count.max), 1))
 
-        if current_period < len(self.__trs):
+        if len(self) % self.__pooling_period > 0:
             self._values.append(self._values[-1])
         else:
-            input_ = self.input[current_period * self.__pooling_period + 1:(current_period + 1) * self.__pooling_period + 1]
+            input_ = self.__input[1 + len(self.__trs) * self.__pooling_period:1 + (len(self.__trs) + 1) * self.__pooling_period]
             high = max(input_)
             low = min(input_)
-            close = self.input[current_period * self.__pooling_period]
+            close = self.__input[len(self.__trs) * self.__pooling_period]
 
             self.__trs.append(max(high - low, abs(high - close), abs(low - close)))
-            self._values.append((self._values[-1] * (self.__period_count - 1) + self.__trs[-1]) / self.__period_count)
+            self._values.append((self._values[-1] * (period_count - 1) + self.__trs[-1]) / period_count)
             self.atrs.append(self._values[-1])
-
-def atr(input_, pooling_period, period_count):
-    return Atr(input_, pooling_period, period_count)[:]
