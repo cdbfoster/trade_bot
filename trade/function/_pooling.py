@@ -13,100 +13,116 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class Close(Function):
+    __input = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        Function.__init__(self)
+        self.__input = input_
+        self.__period = int(period)
 
         self.closes = []
 
-        Function.__init__(self)
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period - 1
-        if input_index >= len(self.input):
+        if len(self) + self.__period > len(self.__input):
             raise StopIteration
 
-        current_period = len(self) // self.__period
+        self.inputs.sync_to_input_index(self.__input, self.__period)
 
-        if current_period < len(self.closes):
+        input_ = self.__input.consume()
+
+        if len(self) % self.__period > 0:
             self._values.append(self._values[-1])
         else:
-            self._values.append(self.input[input_index])
+            self._values.append(input_)
             self.closes.append(self._values[-1])
 
 class High(Function):
+    __input = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        Function.__init__(self)
+        self.__input = input_
+        self.__period = int(period)
 
         self.highs = []
 
-        Function.__init__(self)
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period - 1
-        if input_index >= len(self.input):
+        if len(self) + self.__period > len(self.__input):
             raise StopIteration
 
-        current_period = len(self) // self.__period
+        self.inputs.sync_to_input_index(self.__input, self.__period)
 
-        if current_period < len(self.highs):
+        self.__input.consume()
+
+        if len(self) % self.__period > 0:
             self._values.append(self._values[-1])
         else:
-            self._values.append(max(self.input[input_index - self.__period + 1:input_index + 1]))
+            self._values.append(max(self.__input[len(self.highs) * self.__period:(len(self.highs) + 1) * self.__period]))
             self.highs.append(self._values[-1])
 
 class Low(Function):
+    __input = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        Function.__init__(self)
+        self.__input = input_
+        self.__period = int(period)
 
         self.lows = []
 
-        Function.__init__(self)
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period - 1
-        if input_index >= len(self.input):
+        if len(self) + self.__period > len(self.__input):
             raise StopIteration
 
-        current_period = len(self) // self.__period
+        self.inputs.sync_to_input_index(self.__input, self.__period)
 
-        if current_period < len(self.lows):
+        self.__input.consume()
+
+        if len(self) % self.__period > 0:
             self._values.append(self._values[-1])
         else:
-            self._values.append(min(self.input[input_index - self.__period + 1:input_index + 1]))
+            self._values.append(min(self.__input[len(self.lows) * self.__period:(len(self.lows) + 1) * self.__period]))
             self.lows.append(self._values[-1])
 
 class Open(Function):
+    __input = FunctionInput()
+
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        Function.__init__(self)
+        self.__input = input_
+        self.__period = int(period)
 
         self.opens = []
 
-        Function.__init__(self)
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period - 1
-        if input_index >= len(self.input):
+        if len(self) + self.__period > len(self.__input):
             raise StopIteration
 
-        current_period = len(self) // self.__period
+        self.inputs.sync_to_input_index(self.__input, self.__period)
 
-        if current_period < len(self.opens):
+        self.__input.consume()
+
+        if len(self) % self.__period > 0:
             self._values.append(self._values[-1])
         else:
-            self._values.append(self.input[input_index - self.__period + 1])
+            self._values.append(self.__input[len(self.opens) * self.__period])
             self.opens.append(self._values[-1])
