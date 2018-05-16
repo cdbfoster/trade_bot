@@ -29,18 +29,19 @@ class AroonUp(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + self.__period.max >= len(self.__input):
+        if len(self) + int(self.__period.max) >= len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, self.__period.max)
+        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
 
-        self.__input.consume()
-        period = min(int(self.__period.consume()), self.__period.max)
+        period = int(min(self.__period.consume(), self.__period.max))
 
         high = (None, None)
         for i in range(self.__input.consumed - period, self.__input.consumed + 1):
             if high[0] is not None and self.__input[i] > high[0] or high[0] is None:
                 high = (self.__input[i], self.__input.consumed - i)
+
+        self.__input.consume()
 
         self._values.append(100 * (period - high[1]) / period)
 
@@ -58,18 +59,19 @@ class AroonDown(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + self.__period.max >= len(self.__input):
+        if len(self) + int(self.__period.max) >= len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, self.__period.max)
+        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
 
-        self.__input.consume()
-        period = min(int(self.__period.consume()), self.__period.max)
+        period = int(min(self.__period.consume(), self.__period.max))
 
         low = (None, None)
-        for i in range(self.__input.consumed - period, self.__input.consumed + 1):
+        for i in range(self.__input.consumed - period, self.__input.consumed):
             if low[0] is not None and self.__input[i] < low[0] or low[0] is None:
                 low = (self.__input[i], self.__input.consumed - i)
+
+        self.__input.consume()
 
         self._values.append(100 * (period - low[1]) / period)
 
