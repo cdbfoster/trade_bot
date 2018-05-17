@@ -13,20 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class Skip(Function):
+    __input = FunctionInput()
     def __init__(self, input_, skip):
-        self.input = input_
-        self.__skip = skip
-
         Function.__init__(self)
+        self.__input = input_
+        self.__skip = int(skip)
+
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__skip
-        if input_index >= len(self.input):
+        if len(self) + self.__skip > len(self.__input):
             raise StopIteration
 
-        self._values.append(self.input[input_index])
+        self.inputs.sync_to_input_index(self.__input, self.__skip)
+
+        self._values.append(self.__input.consume())
