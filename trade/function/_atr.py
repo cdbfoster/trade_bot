@@ -55,9 +55,9 @@ class Atr(Function):
 
             self.__trs.append(max(high - low, abs(high - close), abs(low - close)))
 
-        self._values.append(np.mean(self.__trs))
-        self.__last_pool_boundary = len(self)
+        self.__last_pool_boundary = 0
         self.__last_pooling_period = pooling_period
+        self._values.append(np.mean(self.__trs))
         self.atrs.append(self._values[-1])
 
     def _next(self):
@@ -78,8 +78,8 @@ class Atr(Function):
             low = min(input_)
             close = self.__input[self.__input.consumed - self.__last_pooling_period - 1]
 
-            self.__trs.append(max(high - low, abs(high - close), abs(low - close)))
-            self._values.append((self._values[-1] * (period_count - 1) + self.__trs[-1]) / period_count)
             self.__last_pool_boundary = len(self)
             self.__last_pooling_period = pooling_period
+            self.__trs.append(max(high - low, abs(high - close), abs(low - close)))
+            self._values.append((self._values[-1] * (period_count - 1) + self.__trs[-1]) / period_count)
             self.atrs.append(self._values[-1])
