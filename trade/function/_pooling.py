@@ -50,7 +50,7 @@ class Close(Function):
             self.__last_boundary = len(self)
             self.__last_period = period
             self._values.append(input_)
-            self.closes.append(self._values[-1])
+            self.closes.append((self._values[-1], self.__last_boundary))
 
 class High(Function):
     __input = FunctionInput()
@@ -87,7 +87,7 @@ class High(Function):
             self.__last_boundary = len(self)
             self._values.append(max(self.__input[self.__input.consumed - self.__last_period:self.__input.consumed]))
             self.__last_period = period
-            self.highs.append(self._values[-1])
+            self.highs.append((self._values[-1], self.__last_boundary))
 
 class Low(Function):
     __input = FunctionInput()
@@ -124,7 +124,7 @@ class Low(Function):
             self.__last_boundary = len(self)
             self._values.append(min(self.__input[self.__input.consumed - self.__last_period:self.__input.consumed]))
             self.__last_period = period
-            self.lows.append(self._values[-1])
+            self.lows.append((self._values[-1], self.__last_boundary))
 
 class Open(Function):
     __input = FunctionInput()
@@ -161,4 +161,4 @@ class Open(Function):
             self.__last_boundary = len(self)
             self.__last_period = period
             self._values.append(self.__input[self.__input.consumed - period])
-            self.opens.append(self._values[-1])
+            self.opens.append((self._values[-1], self.__last_boundary))
