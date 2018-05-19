@@ -223,6 +223,9 @@ class FunctionInput:
             else:
                 raise TypeError("function input indices must be integers or slices")
 
+    def __getattr__(self, attr):
+        return getattr(self.__core, attr)
+
     def __get_offset(self):
         lengths = [len(core) for core in [i.__core for i in self.__function.inputs if hasattr(i.__core, "__len__")]]
         min_length = min(lengths) if len(lengths) > 0 else 0
