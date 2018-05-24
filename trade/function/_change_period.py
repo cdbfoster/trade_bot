@@ -15,34 +15,44 @@
 
 import numpy as np
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class ChangePeriod(Function):
-    def __init__(self, input_, change, sample_range):
-        self.input = input_
-        self.__change = change
-        self.__range = sample_range
+    __input = FunctionInput()
+    __change = FunctionInput()
+    __period = FunctionInput()
 
+    def __init__(self, input_, change, period):
         Function.__init__(self)
+        self.__input = input_
+        self.__change = change
+        self.__period = period
+
+        self._update()
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__range
-        if input_index > len(self.input):
+        if len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        frequencies = np.fft.rfftfreq(self.__range)[::-1]
+        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
 
-        samples = np.array(self.input[input_index - self.__range:input_index])
+        self.__input.consume()
+        change = self.__change.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
+
+        frequencies = np.fft.rfftfreq(period)[::-1]
+
+        samples = np.array(self.__input[self.__input.consumed - period:self.__input.consumed])
         min_ = np.min(samples)
         range_ = np.max(samples) - min_
 
-        fourier_transform = np.fft.rfft(2 * (samples - min_) / range_ - 1) / (0.5 * self.__range)
+        fourier_transform = np.fft.rfft(2 * (samples - min_) / range_ - 1) / (0.5 * period)
 
         magnitude = np.abs(fourier_transform)[::-1]
 
-        target_magnitude = np.mean(samples) * abs(0.5 * self.__change) / range_
+        target_magnitude = np.mean(samples) * abs(0.5 * change) / range_
 
         if target_magnitude <= np.max(magnitude):
             if target_magnitude > magnitude[0]:
@@ -50,12 +60,9 @@ class ChangePeriod(Function):
                     if m >= target_magnitude:
                         x = (m - target_magnitude) / (m - magnitude[i - 1])
                         frequency = frequencies[i - 1] * x + frequencies[i] * (1 - x)
-                        self._values.append(min(1 / frequency, self.__range))
+                        self._values.append(min(1 / frequency, period))
                         break
             else:
                 self._values.append(1 / frequencies[0])
         else:
-            self._values.append(self.__range)
-
-def change_period(input_, change, sample_range):
-    return ChangePeriod(input_, change, sample_range)[:]
+            self._values.append(period)
