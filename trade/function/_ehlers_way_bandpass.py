@@ -15,41 +15,35 @@
 
 import math
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class EhlersWayBandpass(Function):
     def __init__(self, input_, period, delta):
-        self.input = input_
-        self.__period = period
-        self.__delta = delta
-
-        self.__beta = math.cos(2 * math.pi / self.__period)
-        gamma = 1 / math.cos(4 * math.pi * self.__delta / self.__period)
-        self.__alpha = gamma - math.sqrt(gamma * gamma - 1)
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
+        self.__delta = FunctionInput(delta)
 
         Function.__init__(self)
 
-    def _first(self):
-        self.input._update()
-
-        if len(self.input) < 5:
-            raise StopIteration
-
-        bp2 = 0.5 * (self.input[2] - self.input[0])
-        bp1 = 0.5 * (1 - self.__alpha) * (self.input[3] - self.input[1]) + self.__beta * bp2
-        bp = 0.5 * (1 - self.__alpha) * (self.input[4] - self.input[2]) + self.__beta * bp1 - self.__alpha * bp2
-
-        self._values.append(bp1)
-        self._values.append(bp)
-
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + 5 - 2;
-        if input_index >= len(self.input):
+        if len(self.__period) == 0 or len(self.__delta) == 0 or len(self) + 5 > len(self.__input):
             raise StopIteration
 
-        self._values.append(0.5 * (1 - self.__alpha) * (self.input[input_index] - self.input[input_index - 2]) + self.__beta * (1 + self.__alpha) * self._values[-1] - self.__alpha * self._values[-2])
+        self.inputs.sync_to_min_length()
 
-def ehlers_way_bandpass(input_, period, delta):
-    return EhlersWayBandpass(input_, period, delta)[:]
+        period = self.__period.consume()
+        delta = self.__delta.consume()
+
+        beta = math.cos(2 * math.pi / period)
+        gamma = 1 / math.cos(4 * math.pi * delta / period)
+        alpha = gamma - math.sqrt(gamma * gamma - 1)
+
+        i = self.__input.consumed
+        bp2 = self._values[-min(len(self), 2)] if len(self) >= 1 else 0.5 * (1 - alpha) * (self.__input[i - 2] - self.__input[i - 4]) + beta * (1 + alpha) * (self.__input[i - 2] - self.__input[i - 4]) - alpha * (self.__input[i - 2] - self.__input[i - 4])
+        bp1 = self._values[-1] if len(self) >= 2 else 0.5 * (1 - alpha) * (self.__input[i - 1] - self.__input[i - 3]) + beta * (1 + alpha) * (self.__input[i - 1] - self.__input[i - 3]) - alpha * bp2
+        bp = 0.5 * (1 - alpha) * (self.__input[i] - self.__input[i - 2]) + beta * (1 + alpha) * bp1 - alpha * bp2
+
+        self._values.append(bp)
+        self.__input.consume()
