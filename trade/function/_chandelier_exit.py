@@ -16,23 +16,17 @@
 from trade.function import Atr, Function, FunctionInput, High, Low, Skip
 
 class ChandelierExitLong(Function):
-    __period_count = FunctionInput()
-    __multiplier = FunctionInput()
-    __high = FunctionInput()
-    __atr = FunctionInput()
-
     def __init__(self, input_, pooling_period, period_count, multiplier):
-        Function.__init__(self)
-        self.__period_count = period_count
-        self.__multiplier = multiplier
+        self.__period_count = FunctionInput(period_count)
+        self.__multiplier = FunctionInput(multiplier)
 
-        self.__high = High(Skip(input_, 1), pooling_period)
-        self.__atr = Atr(input_, pooling_period, period_count)
+        self.__high = FunctionInput(High(Skip(input_, 1), pooling_period))
+        self.__atr = FunctionInput(Atr(input_, pooling_period, period_count))
 
         self.__current_period = 0
         self.__current_period_count = None
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -56,23 +50,17 @@ class ChandelierExitLong(Function):
         self._values.append(period_high - atr * multiplier)
 
 class ChandelierExitShort(Function):
-    __period_count = FunctionInput()
-    __multiplier = FunctionInput()
-    __low = FunctionInput()
-    __atr = FunctionInput()
-
     def __init__(self, input_, pooling_period, period_count, multiplier):
-        Function.__init__(self)
-        self.__period_count = period_count
-        self.__multiplier = multiplier
+        self.__period_count = FunctionInput(period_count)
+        self.__multiplier = FunctionInput(multiplier)
 
-        self.__low = Low(Skip(input_, 1), pooling_period)
-        self.__atr = Atr(input_, pooling_period, period_count)
+        self.__low = FunctionInput(Low(Skip(input_, 1), pooling_period))
+        self.__atr = FunctionInput(Atr(input_, pooling_period, period_count))
 
         self.__current_period = 0
         self.__current_period_count = None
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()

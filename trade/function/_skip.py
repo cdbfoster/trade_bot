@@ -16,13 +16,11 @@
 from trade.function import Function, FunctionInput
 
 class Skip(Function):
-    __input = FunctionInput()
     def __init__(self, input_, skip):
-        Function.__init__(self)
-        self.__input = input_
+        self.__input = FunctionInput(input_)
         self.__skip = int(skip)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()

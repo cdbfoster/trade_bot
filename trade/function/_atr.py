@@ -18,22 +18,17 @@ import numpy as np
 from trade.function import Function, FunctionInput
 
 class Atr(Function):
-    __input = FunctionInput()
-    __pooling_period = FunctionInput()
-    __period_count = FunctionInput()
-
     def __init__(self, input_, pooling_period, period_count):
-        Function.__init__(self)
-        self.__input = input_
-        self.__pooling_period = pooling_period
-        self.__period_count = period_count
+        self.__input = FunctionInput(input_)
+        self.__pooling_period = FunctionInput(pooling_period)
+        self.__period_count = FunctionInput(period_count)
 
         self.__last_pool_boundary = None
         self.__last_pooling_period = None
         self.__trs = []
         self.atrs = []
 
-        self._update()
+        Function.__init__(self)
 
     def _first(self):
         self.inputs.update()

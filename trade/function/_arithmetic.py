@@ -16,15 +16,11 @@
 from trade.function import Function, FunctionInput
 
 class Add(Function):
-    input1 = FunctionInput()
-    input2 = FunctionInput()
-
     def __init__(self, input1, input2):
-        Function.__init__(self)
-        self.input1 = input1
-        self.input2 = input2
+        self.input1 = FunctionInput(input1)
+        self.input2 = FunctionInput(input2)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -40,15 +36,11 @@ class Add(Function):
         self._values.append(a + b)
 
 class Divide(Function):
-    input1 = FunctionInput()
-    input2 = FunctionInput()
-
     def __init__(self, input1, input2):
-        Function.__init__(self)
-        self.input1 = input1
-        self.input2 = input2
+        self.input1 = FunctionInput(input1)
+        self.input2 = FunctionInput(input2)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -66,15 +58,11 @@ class Divide(Function):
         self._values.append(a / b)
 
 class Multiply(Function):
-    input1 = FunctionInput()
-    input2 = FunctionInput()
-
     def __init__(self, input1, input2):
-        Function.__init__(self)
-        self.input1 = input1
-        self.input2 = input2
+        self.input1 = FunctionInput(input1)
+        self.input2 = FunctionInput(input2)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -90,15 +78,11 @@ class Multiply(Function):
         self._values.append(a * b)
 
 class Subtract(Function):
-    input1 = FunctionInput()
-    input2 = FunctionInput()
-
     def __init__(self, input1, input2):
-        Function.__init__(self)
-        self.input1 = input1
-        self.input2 = input2
+        self.input1 = FunctionInput(input1)
+        self.input2 = FunctionInput(input2)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()

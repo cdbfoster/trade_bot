@@ -16,19 +16,15 @@
 from trade.function import Function, FunctionInput
 
 class Close(Function):
-    __input = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         self.__last_boundary = 0
         self.__last_period = None
         self.closes = []
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -53,19 +49,15 @@ class Close(Function):
             self.closes.append((self._values[-1], self.__last_boundary))
 
 class High(Function):
-    __input = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         self.__last_boundary = 0
         self.__last_period = None
         self.highs = []
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -90,19 +82,15 @@ class High(Function):
             self.highs.append((self._values[-1], self.__last_boundary))
 
 class Low(Function):
-    __input = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         self.__last_boundary = 0
         self.__last_period = None
         self.lows = []
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -127,19 +115,15 @@ class Low(Function):
             self.lows.append((self._values[-1], self.__last_boundary))
 
 class Open(Function):
-    __input = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         self.__last_boundary = 0
         self.__last_period = None
         self.opens = []
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()

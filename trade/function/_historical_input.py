@@ -17,7 +17,6 @@ from trade.function import Function
 
 class HistoricalInput(Function):
     def __init__(self, filename, start=None, position=None, reverse=False):
-        Function.__init__(self)
         self.__prices = list(float(line.strip()) for line in open(filename))
 
         if reverse:
@@ -27,7 +26,7 @@ class HistoricalInput(Function):
 
         self.__position = position if position is not None else max(len(self.__prices) - 1, 0)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         if len(self) > self.__position or len(self.__prices) == 0:

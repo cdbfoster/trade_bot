@@ -18,17 +18,12 @@ import numpy as np
 from trade.function import Function, FunctionInput
 
 class ChangePeriod(Function):
-    __input = FunctionInput()
-    __change = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, change, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__change = change
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__change = FunctionInput(change)
+        self.__period = FunctionInput(period)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()

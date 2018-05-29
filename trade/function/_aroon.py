@@ -16,15 +16,11 @@
 from trade.function import Function, FunctionInput
 
 class AroonUp(Function):
-    __input = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -45,15 +41,11 @@ class AroonUp(Function):
         self._values.append(100 * (period - high[1]) / period)
 
 class AroonDown(Function):
-    __input = FunctionInput()
-    __period = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()
@@ -74,15 +66,11 @@ class AroonDown(Function):
         self._values.append(100 * (period - low[1]) / period)
 
 class AroonOscillator(Function):
-    __up = FunctionInput()
-    __down = FunctionInput()
-
     def __init__(self, input_, period):
-        Function.__init__(self)
-        self.__up = AroonUp(input_, period)
-        self.__down = AroonDown(input_, period)
+        self.__up = FunctionInput(AroonUp(input_, period))
+        self.__down = FunctionInput(AroonDown(input_, period))
 
-        self._update()
+        Function.__init__(self)
 
     def _next(self):
         self.inputs.update()

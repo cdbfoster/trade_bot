@@ -16,7 +16,13 @@
 class Function:
     def __init__(self):
         self.inputs = FunctionInputs()
+        for input_, name in [(getattr(self, attribute), attribute) for attribute in dir(self) if isinstance(getattr(self, attribute), FunctionInput)]:
+            self.inputs.add(input_)
+            input_.name = name
+            input_._FunctionInput__function = self
+
         self._values = []
+        self._update()
 
     def __len__(self):
         return len(self._values)
@@ -138,10 +144,15 @@ class FunctionInputs(set):
             i.update()
 
 class FunctionInput:
-    def __init__(self):
-        self.name = None
-        self.__core = None
+    def __init__(self, value):
+        if isinstance(value, tuple) and len(value) >= 2 and isinstance(value[0], Function):
+            self.__core = value[0]
+            self.__max = value[1]
+        else:
+            self.__core = value
         self.__consumed = 0
+
+        self.name = None
         self.__function = None
 
     def consume(self, count=1):
@@ -175,21 +186,6 @@ class FunctionInput:
     def update(self):
         if isinstance(self.__core, Function):
             self.__core._update()
-
-    def __set_name__(self, owner, name):
-        self.name = name
-
-    def __set__(self, instance, value):
-        if isinstance(instance, Function):
-            instance.inputs.add(self)
-            self.__function = instance
-
-        if isinstance(value, tuple) and len(value) >= 2 and isinstance(value[0], Function):
-            self.__core = value[0]
-            self.__max = value[1]
-        else:
-            self.__core = value
-        self.__consumed = 0
 
     def __len__(self):
         if hasattr(self.__core, "__len__"):
