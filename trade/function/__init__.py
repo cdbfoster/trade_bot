@@ -232,7 +232,7 @@ from ._aroon import AroonUp, AroonDown, AroonOscillator
 from ._atr import Atr
 from ._change_period import ChangePeriod
 from ._ehlers_way_bandpass import EhlersWayBandpass
-from ._ema import Ema, ema
+from ._ema import Ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram
 from ._pooling import Close, High, Low, Open

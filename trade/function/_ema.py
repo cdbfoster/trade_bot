@@ -15,36 +15,37 @@
 
 import numpy as np
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class Ema(Function):
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
-        self.__weight = 2 / (self.__period + 1)
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         Function.__init__(self)
 
     def _first(self):
-        self.input._update()
+        self.inputs.update()
 
-        if len(self.input) < 2 * self.__period:
+        if int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        ema = np.mean(self.input[:self.__period])
-        for x in self.input[self.__period: 2 * self.__period - 1]:
-            ema = (x - ema) * self.__weight + ema
+        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
 
-        self._values.append((self.input[2 * self.__period - 1] - ema) * self.__weight + ema)
+        self.__input.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
+
+        self._values.append(np.mean(self.__input[self.__input.consumed - period:self.__input.consumed]))
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + 2 * self.__period - 1
-        if input_index >= len(self.input):
+        if len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        self._values.append((self.input[input_index] - self._values[-1]) * self.__weight + self._values[-1])
+        input_ = self.__input.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
 
-def ema(input_, period):
-    return Ema(input_, period)[:]
+        weight = 2 / (period + 1)
+
+        self._values.append((input_ - self._values[-1]) * weight + self._values[-1])
