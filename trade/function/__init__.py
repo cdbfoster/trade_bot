@@ -231,7 +231,7 @@ from ._arithmetic import Add, Divide, Multiply, Subtract
 from ._aroon import AroonUp, AroonDown, AroonOscillator
 from ._atr import Atr
 from ._change_period import ChangePeriod
-from ._ehlers_way_bandpass import EhlersWayBandpass, ehlers_way_bandpass
+from ._ehlers_way_bandpass import EhlersWayBandpass
 from ._ema import Ema, ema
 from ._historical_input import HistoricalInput, historical_input
 from ._macd import Macd, MacdHistogram, macd, macd_histogram

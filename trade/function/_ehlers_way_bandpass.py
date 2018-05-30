@@ -31,7 +31,7 @@ class EhlersWayBandpass(Function):
         if len(self.__period) == 0 or len(self.__delta) == 0 or len(self) + 5 > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync_to_input_index(self.__input, 5)
 
         period = self.__period.consume()
         delta = self.__delta.consume()
@@ -41,8 +41,8 @@ class EhlersWayBandpass(Function):
         alpha = gamma - math.sqrt(gamma * gamma - 1)
 
         i = self.__input.consumed
-        bp2 = self._values[-min(len(self), 2)] if len(self) >= 1 else 0.5 * (1 - alpha) * (self.__input[i - 2] - self.__input[i - 4]) + beta * (1 + alpha) * (self.__input[i - 2] - self.__input[i - 4]) - alpha * (self.__input[i - 2] - self.__input[i - 4])
-        bp1 = self._values[-1] if len(self) >= 2 else 0.5 * (1 - alpha) * (self.__input[i - 1] - self.__input[i - 3]) + beta * (1 + alpha) * (self.__input[i - 1] - self.__input[i - 3]) - alpha * bp2
+        bp2 = self._values[-min(len(self), 2)] if len(self) >= 1 else 0.5 * (1 - alpha) * (self.__input[i - 2] - self.__input[i - 4])
+        bp1 = self._values[-1] if len(self) >= 2 else 0.5 * (1 - alpha) * (self.__input[i - 1] - self.__input[i - 3]) + beta * (1 + alpha) * bp2
         bp = 0.5 * (1 - alpha) * (self.__input[i] - self.__input[i - 2]) + beta * (1 + alpha) * bp1 - alpha * bp2
 
         self._values.append(bp)
