@@ -197,7 +197,7 @@ class FunctionInput:
             return 0
 
     def __getitem__(self, index):
-        if hasattr(self.__core, "__getitem__"):
+        if hasattr(self.__core, "__getitem__") and not isinstance(self.__core, int) and not isinstance(self.__core, float):
             return self.__core[index]
         else:
             length = len(self)
