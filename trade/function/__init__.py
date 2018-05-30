@@ -241,5 +241,5 @@ from ._chandelier_exit import ChandelierExitLong, ChandelierExitShort # Needs At
 from ._slope import Slope, slope
 from ._rsi import Rsi, rsi # Needs Slope
 from ._standard_deviation import StandardDeviation
-from ._dominant_band import DominantBand, dominant_band # Needs EhlersWayBandpass, StandardDeviation
+from ._dominant_band import DominantBand # Needs EhlersWayBandpass, StandardDeviation
 from ._z_score import ZScore, z_score

@@ -15,42 +15,38 @@
 
 import numpy as np
 
-from trade.function import EhlersWayBandpass, Function, StandardDeviation
+from trade.function import EhlersWayBandpass, Function, FunctionInput, StandardDeviation
 
 class DominantBand(Function):
     def __init__(self, input_, std_dev_period, band_min, band_max, band_count, interpolate):
-        self.input = input_
-        self.__std_dev_period = std_dev_period
-        self.__band_min = band_min
-        self.__band_max = band_max
-        self.__band_count = band_count
+        self.__input = FunctionInput(input_)
         self.__interpolate = interpolate
 
-        self.__band_periods = np.geomspace(self.__band_min, self.__band_max, self.__band_count)
-        self.__bands = list(StandardDeviation(EhlersWayBandpass(self.input, period, 0.5), self.__std_dev_period) for period in self.__band_periods)
+        self.__band_periods = np.geomspace(band_min, band_max, band_count)
+        self.__bands = list(FunctionInput(StandardDeviation(EhlersWayBandpass(input_, period, 0.5), std_dev_period)) for period in self.__band_periods)
+        for i, band in enumerate(self.__bands):
+            setattr(self, "_DominantBand__band{}".format(i), band)
 
         Function.__init__(self)
 
     def _next(self):
-        for band in self.__bands:
-            band._update()
+        self.inputs.update()
 
         if len(self) >= len(self.__bands[0]):
             raise StopIteration
 
-        input_index = len(self) - 1
-        std_devs = [band[input_index] for band in self.__bands]
+        self.inputs.sync_to_min_length()
+
+        self.__input.consume()
+        std_devs = [band.consume() for band in self.__bands]
 
         value = 0
         if self.__interpolate:
             value = 1
             normalized_std_devs = np.array(std_devs) / np.sum(std_devs)
-            for i in range(0, self.__band_count):
+            for i in range(0, len(self.__bands)):
                 value *= self.__band_periods[i] ** normalized_std_devs[i]
         else:
             value = self.__band_periods[np.argmax(std_devs)]
 
         self._values.append(value)
-
-def dominant_band(input_, std_dev_period, band_min, band_max, band_count, interpolate):
-    return DominantBand(input_, std_dev_period, band_min, band_max, band_count, interpolate)[:]
