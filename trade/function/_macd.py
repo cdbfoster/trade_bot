@@ -13,29 +13,37 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Function, Ema
+from trade.function import Ema, Function, FunctionInput
 
 class Macd(Function):
-    def __init__(self, input_, short_period, long_period):
-        if short_period >= long_period:
-            raise ValueError("short_period must be less than long_period")
+    def __init__(self, input_, period1, period2):
+        self.__input = FunctionInput(input_)
+        self.__period1 = FunctionInput(period1)
+        self.__period2 = FunctionInput(period2)
 
-        self.input = input_
-
-        self.__short = Ema(input_, period=short_period)
-        self.__long = Ema(input_, period=long_period)
+        self.__ema1 = FunctionInput(Ema(input_, period1))
+        self.__ema2 = FunctionInput(Ema(input_, period2))
 
         Function.__init__(self)
 
     def _next(self):
-        self.__short._update()
-        self.__long._update()
+        self.inputs.update()
 
-        if len(self.__long) == 0 or len(self) == len(self.__long):
+        if len(self) >= min(len(self.__ema1), len(self.__ema2)):
             raise StopIteration
 
-        offset = len(self.__short) - len(self.__long)
-        self._values.append(self.__short[len(self) + offset] - self.__long[len(self)])
+        self.inputs.sync_to_min_length()
+
+        self.__input.consume()
+        period1 = int(min(self.__period1.consume(), self.__period1.max))
+        period2 = int(min(self.__period2.consume(), self.__period2.max))
+        ema1 = self.__ema1.consume()
+        ema2 = self.__ema2.consume()
+
+        if period2 < period1:
+            ema1, ema2 = ema2, ema1
+
+        self._values.append(ema1 - ema2)
 
 class MacdHistogram(Function):
     def __init__(self, input_, short_period, long_period, signal_period):
