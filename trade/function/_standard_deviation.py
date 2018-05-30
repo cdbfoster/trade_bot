@@ -15,12 +15,12 @@
 
 import numpy as np
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class StandardDeviation(Function):
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         self.__mean = 0.0
         self.__error_sum = 0.0
@@ -29,40 +29,43 @@ class StandardDeviation(Function):
         Function.__init__(self)
 
     def _first(self):
-        self.input._update()
+        self.inputs.update()
 
-        if len(self.input) < self.__period:
+        if len(self.__period) == 0 or int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        input_ = np.array(self.input[:self.__period])
+        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
+
+        self.__input.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
+
+        input_ = np.array(self.__input[self.__input.consumed - period:self.__input.consumed])
         self.__mean = np.mean(input_)
         self.__error_sum = np.sum((input_ - self.__mean) ** 2)
-        self.__variance = self.__error_sum / self.__period
+        self.__variance = self.__error_sum / period
 
         self._values.append(np.sqrt(self.__variance))
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period - 1
-        if input_index >= len(self.input):
+        if len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        value_discard = self.input[len(self) - 1]
-        value_new = self.input[input_index]
+        value_discard = self.__input[self.__input.consumed - 1]
+        value_new = self.__input.consume()
+        period_discard = int(min(self.__period[self.__period.consumed - 1], self.__period.max))
+        period_new = int(min(self.__period.consume(), self.__period.max))
 
         delta_new_discard = value_new - value_discard
         delta_discard_mean = value_discard - self.__mean
 
         delta_new_mean_before = value_new - self.__mean
-        self.__mean += delta_new_discard / self.__period
+        self.__mean += delta_new_discard / period_new
         delta_new_mean_after = value_new - self.__mean
 
-        self.__error_sum -= ((delta_discard_mean * delta_discard_mean - delta_new_mean_before * delta_new_mean_after) * self.__period +
-            delta_new_discard * delta_new_mean_after) / (self.__period - 1)
-        self.__variance = abs(self.__error_sum / self.__period)
+        self.__error_sum -= ((delta_discard_mean * delta_discard_mean - delta_new_mean_before * delta_new_mean_after) * period_discard +
+            delta_new_discard * delta_new_mean_after) / (period_discard - 1)
+        self.__variance = abs(self.__error_sum / period_new)
 
         self._values.append(np.sqrt(self.__variance))
-
-def standard_deviation(input_, period):
-    return StandardDeviation(input_, period)[:]
