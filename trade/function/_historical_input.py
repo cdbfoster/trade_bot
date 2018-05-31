@@ -17,7 +17,7 @@ from trade.function import Function
 
 class HistoricalInput(Function):
     def __init__(self, filename, start=None, position=None, reverse=False):
-        self.__prices = list(float(line.strip()) for line in open(filename))
+        self.__prices = list(float(line.strip()) for line in open(filename) if not line.startswith("#"))
 
         if reverse:
             self.__prices = self.__prices[::-1]
