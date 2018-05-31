@@ -13,26 +13,30 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.indicator import Indicator, Signal
+from trade.indicator import Indicator, IndicatorInput, Signal
 
 class Threshold(Indicator):
     def __init__(self, input_, threshold, signal, fuzziness=None):
-        self.input = input_
-        self.__threshold = threshold
+        self.__input = IndicatorInput(input_)
+        self.__threshold = IndicatorInput(threshold)
         self.__signal = signal
-        self.__fuzziness = fuzziness
+        self.__fuzziness = IndicatorInput(fuzziness if fuzziness is not None else 0)
 
         Indicator.__init__(self)
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        if len(self) == len(self.input):
+        if len(self) >= min(len(self.__input), len(self.__threshold), len(self.__fuzziness)):
             raise StopIteration
 
-        this_value = self.input[len(self)]
+        self.inputs.sync_to_min_length()
 
-        if this_value >= self.__threshold - (self.__fuzziness if self.__fuzziness is not None else 0):
+        this_value = self.__input.consume()
+        threshold = self.__threshold.consume()
+        fuzziness = self.__fuzziness.consume()
+
+        if this_value >= threshold - fuzziness:
             self._values.append(self.__signal)
         else:
             self._values.append(Signal.HOLD)
