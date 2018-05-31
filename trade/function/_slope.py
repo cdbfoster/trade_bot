@@ -13,22 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class Slope(Function):
     def __init__(self, input_):
-        self.input = input_
+        self.__input = FunctionInput(input_)
 
         Function.__init__(self)
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + 1
-        if input_index >= len(self.input):
+        if len(self) + 2 > len(self.__input):
             raise StopIteration
 
-        self._values.append(self.input[input_index] - self.input[input_index - 1])
+        self.inputs.sync_to_input_index(self.__input, 2)
 
-def slope(input_):
-    return Slope(input_)[:]
+        self._values.append(self.__input[self.__input.consumed] - self.__input[self.__input.consumed - 1])
+        self.__input.consume()
