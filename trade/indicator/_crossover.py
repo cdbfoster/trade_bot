@@ -16,25 +16,28 @@
 import math
 
 from trade.function import Subtract
-from trade.indicator import Indicator, Signal
+from trade.indicator import Indicator, IndicatorInput, Signal
 
 class Crossover(Indicator):
     def __init__(self, input1, input2=None, continuous=False):
-        self.input = input1 if input2 is None else Subtract(input1, input2)
-        self.input1 = input1
-        self.input2 = input2
+        self.__input1 = IndicatorInput(input1)
+        self.__input2 = IndicatorInput(input2) if input2 is not None else None
         self.__continuous = continuous
+
+        self.__input = self.__input1 if input2 is None else IndicatorInput(Subtract(input1, input2))
 
         Indicator.__init__(self)
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        if len(self.input) < 2 or len(self) == len(self.input) - 1:
+        if len(self) + 2 > len(self.__input):
             raise StopIteration
 
-        last_value = self.input[len(self)]
-        this_value = self.input[len(self) + 1]
+        self.inputs.sync_to_input_index(self.__input, 2)
+
+        last_value = self.__input[self.__input.consumed - 1]
+        this_value = self.__input.consume()
 
         if math.copysign(1, last_value) != math.copysign(1, this_value) or self.__continuous:
             self._values.append(Signal.BUY if this_value > 0 else Signal.SELL)

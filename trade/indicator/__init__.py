@@ -15,7 +15,7 @@
 
 from enum import Enum
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class Signal(Enum):
     BUY = 1
@@ -26,11 +26,9 @@ class Indicator(Function):
     def __init__(self):
         Function.__init__(self)
 
-    def _first(self):
-        self._next()
-
-    def _next(self):
-        pass
+class IndicatorInput(FunctionInput):
+    def __init__(self, value):
+        FunctionInput.__init__(self, value)
 
 from ._crossover import Crossover
 from ._logic import And, Not, Or
