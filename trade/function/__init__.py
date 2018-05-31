@@ -239,7 +239,7 @@ from ._pooling import Close, High, Low, Open
 from ._skip import Skip
 from ._chandelier_exit import ChandelierExitLong, ChandelierExitShort # Needs Atr, High, Low, Skip
 from ._slope import Slope
-from ._rsi import Rsi, rsi # Needs Slope
+from ._rsi import Rsi # Needs Slope
 from ._standard_deviation import StandardDeviation
 from ._dominant_band import DominantBand # Needs EhlersWayBandpass, StandardDeviation
 from ._z_score import ZScore, z_score

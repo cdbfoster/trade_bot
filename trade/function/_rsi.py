@@ -15,45 +15,47 @@
 
 import numpy as np
 
-from trade.function import Function, Slope
+from trade.function import Function, FunctionInput, Slope
 
 class Rsi(Function):
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
-        self.__slope = Slope(input_)
+        self.__slope = FunctionInput(Slope(input_))
         self.__average_gain = None
         self.__average_loss = None
 
         Function.__init__(self)
 
     def _first(self):
-        self.__slope._update()
+        self.inputs.update()
 
-        if len(self.__slope) < 2 * self.__period:
+        if len(self.__period) == 0 or int(self.__period.max) > len(self.__slope):
             raise StopIteration
 
-        self.__average_gain = np.mean([max(d, 0) for d in self.__slope[:self.__period]])
-        self.__average_loss = np.mean([min(d, 0) for d in self.__slope[:self.__period]])
+        self.inputs.sync_to_input_index(self.__slope, int(self.__period.max))
 
-        for d in self.__slope[self.__period:2 * self.__period]:
-            self.__average_gain = (self.__average_gain * (self.__period - 1) + max(d, 0)) / self.__period
-            self.__average_loss = (self.__average_loss * (self.__period - 1) + min(d, 0)) / self.__period
+        self.__input.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
+        self.__slope.consume()
+
+        self.__average_gain = np.mean([max(d, 0) for d in self.__slope[self.__slope.consumed - period:self.__slope.consumed]])
+        self.__average_loss = np.mean([min(d, 0) for d in self.__slope[self.__slope.consumed - period:self.__slope.consumed]])
 
         self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss)) # XXX We'll need some kind of zero division protection
 
     def _next(self):
-        self.__slope._update()
+        self.inputs.update()
 
-        input_index = len(self) + 2 * self.__period - 1
-        if input_index >= len(self.__slope):
+        if len(self) + int(self.__period.max) > len(self.__slope):
             raise StopIteration
 
-        self.__average_gain = (self.__average_gain * (self.__period - 1) + max(self.__slope[input_index], 0)) / self.__period
-        self.__average_loss = (self.__average_loss * (self.__period - 1) + min(self.__slope[input_index], 0)) / self.__period
+        self.__input.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
+        slope = self.__slope.consume()
+
+        self.__average_gain = (self.__average_gain * (period - 1) + max(slope, 0)) / period
+        self.__average_loss = (self.__average_loss * (period - 1) + min(slope, 0)) / period
 
         self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss))
-
-def rsi(input_, period):
-    return Rsi(input_, period)[:]
