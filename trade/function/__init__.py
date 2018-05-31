@@ -242,4 +242,4 @@ from ._slope import Slope
 from ._rsi import Rsi # Needs Slope
 from ._standard_deviation import StandardDeviation
 from ._dominant_band import DominantBand # Needs EhlersWayBandpass, StandardDeviation
-from ._z_score import ZScore, z_score
+from ._z_score import ZScore

@@ -15,27 +15,28 @@
 
 import numpy as np
 
-from trade.function import Function
+from trade.function import Function, FunctionInput
 
 class ZScore(Function):
     def __init__(self, input_, period):
-        self.input = input_
-        self.__period = period
+        self.__input = FunctionInput(input_)
+        self.__period = FunctionInput(period)
 
         Function.__init__(self)
 
     def _next(self):
-        self.input._update()
+        self.inputs.update()
 
-        input_index = len(self) + self.__period - 1
-        if input_index >= len(self.input):
+        if len(self.__period) == 0 or len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        input_ = self.input[input_index - self.__period + 1:input_index + 1]
+        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
+
+        latest_input = self.__input.consume()
+        period = int(min(self.__period.consume(), self.__period.max))
+
+        input_ = self.__input[self.__input.consumed - period:self.__input.consumed]
         mean = np.mean(input_)
         std = np.std(input_)
 
-        self._values.append((self.input[input_index] - mean) / std)
-
-def z_score(input_, period):
-    return ZScore(input_, period)[:]
+        self._values.append((latest_input - mean) / std)
