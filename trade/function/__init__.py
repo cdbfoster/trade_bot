@@ -234,7 +234,7 @@ from ._change_period import ChangePeriod
 from ._ehlers_way_bandpass import EhlersWayBandpass
 from ._ema import Ema
 from ._historical_input import HistoricalInput, historical_input
-from ._macd import Macd, MacdHistogram, macd, macd_histogram
+from ._macd import Macd, MacdHistogram
 from ._pooling import Close, High, Low, Open
 from ._skip import Skip
 from ._chandelier_exit import ChandelierExitLong, ChandelierExitShort # Needs Atr, High, Low, Skip

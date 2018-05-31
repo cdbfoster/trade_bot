@@ -46,26 +46,26 @@ class Macd(Function):
         self._values.append(ema1 - ema2)
 
 class MacdHistogram(Function):
-    def __init__(self, input_, short_period, long_period, signal_period):
-        self.input = input_
+    def __init__(self, input_, period1, period2, signal_period):
+        self.__input = FunctionInput(input_)
 
-        self.__macd = Macd(input_, short_period=short_period, long_period=long_period)
-        self.__macd_signal = Ema(self.__macd, period=signal_period)
+        macd = Macd(input_, period1, period2)
+
+        self.__macd = FunctionInput(macd)
+        self.__macd_signal = FunctionInput(Ema(macd, signal_period))
 
         Function.__init__(self)
 
     def _next(self):
-        self.__macd._update()
-        self.__macd_signal._update()
+        self.inputs.update()
 
-        if len(self.__macd_signal) == 0 or len(self) == len(self.__macd_signal):
+        if len(self) >= len(self.__macd_signal):
             raise StopIteration
 
-        offset = len(self.__macd) - len(self.__macd_signal)
-        self._values.append(self.__macd[len(self) + offset] - self.__macd_signal[len(self)])
+        self.inputs.sync_to_min_length()
 
-def macd(input_, short_period, long_period):
-    return Macd(input_, short_period, long_period)[:]
+        self.__input.consume()
+        macd = self.__macd.consume()
+        macd_signal = self.__macd_signal.consume()
 
-def macd_histogram(input_, short_period, long_period, signal_period):
-    return MacdHistogram(input_, short_period, long_period, signal_period)[:]
+        self._values.append(macd - macd_signal)
