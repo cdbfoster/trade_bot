@@ -34,7 +34,7 @@ class Crossover(Indicator):
         if len(self) + 2 > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, 2)
+        self.inputs.sync({self.__input: 2})
 
         last_value = self.__input[self.__input.consumed - 1]
         this_value = self.__input.consume()

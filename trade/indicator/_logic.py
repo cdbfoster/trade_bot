@@ -28,7 +28,7 @@ class And(Indicator):
         if len(self) >= min(len(self.__input1), len(self.__input2)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         input1 = self.__input1.consume()
         input2 = self.__input2.consume()
@@ -74,7 +74,7 @@ class Or(Indicator):
         if len(self) >= min(len(self.__input1), len(self.__input2)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         input1 = self.__input1.consume()
         input2 = self.__input2.consume()

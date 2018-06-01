@@ -32,7 +32,7 @@ class Macd(Function):
         if len(self) >= min(len(self.__ema1), len(self.__ema2)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         self.__input.consume()
         period1 = int(min(self.__period1.consume(), self.__period1.max))
@@ -62,7 +62,7 @@ class MacdHistogram(Function):
         if len(self) >= len(self.__macd_signal):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         self.__input.consume()
         macd = self.__macd.consume()

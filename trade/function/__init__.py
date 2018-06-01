@@ -15,13 +15,15 @@
 
 class Function:
     def __init__(self):
+        self._values = []
+        self.__finalized = False
+
         self.inputs = FunctionInputs()
         for input_, name in [(getattr(self, attribute), attribute) for attribute in dir(self) if isinstance(getattr(self, attribute), FunctionInput)]:
             self.inputs.add(input_)
             input_.name = name
             input_._FunctionInput__function = self
 
-        self._values = []
         self._update()
 
     def __len__(self):
@@ -60,10 +62,21 @@ class Function:
         raise StopIteration
 
     def _update(self):
-        self.inputs.update()
-        self.__ensure_index(-1)
+        if not self.finalized:
+            self.inputs.update()
+            self.__ensure_index(-1)
+
+    @property
+    def finalized(self):
+        return self.__finalized
+
+    def set_finalized(self, value=True):
+        self.__finalized = value
 
     def __ensure_index(self, index):
+        if self.finalized:
+            return
+
         while len(self) <= index if index > 0 else True:
             try:
                 if len(self._values) == 0:
@@ -110,32 +123,16 @@ class FunctionInputs(set):
         set.__init__(self)
         self.__synced = False
 
-    def sync_to_min_length(self, sync_offset=-1, resync=False):
+    def sync(self, offsets={}, sync_offset=-1, resync=False):
         if self.__synced and not resync:
             return
         self.__synced = True
 
-        lengths = [len(core) for core in [i._FunctionInput__core for i in self if hasattr(i._FunctionInput__core, "__len__")]]
+        lengths = [len(i._FunctionInput__core) - (offsets.get(i) or 0) for i in [i for i in self if hasattr(i._FunctionInput__core, "__len__")]]
         min_length = min(lengths) if len(lengths) > 0 else 0
 
         for i in self:
             offset = len(i) - min_length - i.consumed + sync_offset
-            if offset > 0:
-                i.consume(offset)
-
-    def sync_to_input_index(self, input_, index, sync_offset=-1, resync=False):
-        if self.__synced and not resync:
-            return
-        self.__synced = True
-
-        if input_ is not None:
-            input_length = len(input_)
-        else:
-            lengths = [len(core) for core in [i.__core for i in self if hasattr(i.__core, "__len__")]]
-            input_length = max(lengths) if len(lengths) > 0 else 0
-
-        for i in self:
-            offset = len(i) - input_length + index - i.consumed + sync_offset
             if offset > 0:
                 i.consume(offset)
 

@@ -28,6 +28,6 @@ class Skip(Function):
         if len(self) + self.__skip > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, self.__skip)
+        self.inputs.sync({self.__input: self.__skip})
 
         self._values.append(self.__input.consume())

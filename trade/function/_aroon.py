@@ -25,16 +25,16 @@ class AroonUp(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + int(self.__period.max) > len(self.__input):
+        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
+        self.inputs.sync({self.__input: int(self.__period.max)})
 
         self.__input.consume()
         period = int(min(self.__period.consume(), self.__period.max))
 
         high = (None, None)
-        for i in range(self.__input.consumed - period, self.__input.consumed):
+        for i in range(self.__input.consumed - period - 1, self.__input.consumed):
             if high[0] is not None and self.__input[i] > high[0] or high[0] is None:
                 high = (self.__input[i], self.__input.consumed - i)
 
@@ -50,16 +50,16 @@ class AroonDown(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + int(self.__period.max) > len(self.__input):
+        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
+        self.inputs.sync({self.__input: int(self.__period.max)})
 
         self.__input.consume()
         period = int(min(self.__period.consume(), self.__period.max))
 
         low = (None, None)
-        for i in range(self.__input.consumed - period, self.__input.consumed):
+        for i in range(self.__input.consumed - period - 1, self.__input.consumed):
             if low[0] is not None and self.__input[i] < low[0] or low[0] is None:
                 low = (self.__input[i], self.__input.consumed - i)
 
@@ -78,7 +78,7 @@ class AroonOscillator(Function):
         if len(self) >= len(self.__up):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         up = self.__up.consume()
         down = self.__down.consume()

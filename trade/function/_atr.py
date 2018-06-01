@@ -33,10 +33,10 @@ class Atr(Function):
     def _first(self):
         self.inputs.update()
 
-        if len(self.__pooling_period) == 0 or len(self.__period_count) == 0 or int(self.__pooling_period.max) * int(self.__period_count.max) + 1 > len(self.__input):
+        if min(len(self.__pooling_period), len(self.__period_count)) == 0 or int(self.__pooling_period.max) * int(self.__period_count.max) + 1 > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, int(self.__pooling_period.max) * int(self.__period_count.max) + 1)
+        self.inputs.sync({self.__input: int(self.__pooling_period.max) * int(self.__period_count.max) + 1})
 
         self.__input.consume()
         pooling_period = int(min(self.__pooling_period.consume(), self.__pooling_period.max))
@@ -58,7 +58,7 @@ class Atr(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + int(self.__pooling_period.max) * int(self.__period_count.max) + 1 > len(self.__input):
+        if len(self) >= min(len(self.__pooling_period), len(self.__period_count)) or len(self) + int(self.__pooling_period.max) * int(self.__period_count.max) + 1 > len(self.__input):
             raise StopIteration
 
         self.__input.consume()
