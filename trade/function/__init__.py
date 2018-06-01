@@ -15,13 +15,15 @@
 
 class Function:
     def __init__(self):
+        self._values = []
+        self.__finalized = False
+
         self.inputs = FunctionInputs()
         for input_, name in [(getattr(self, attribute), attribute) for attribute in dir(self) if isinstance(getattr(self, attribute), FunctionInput)]:
             self.inputs.add(input_)
             input_.name = name
             input_._FunctionInput__function = self
 
-        self._values = []
         self._update()
 
     def __len__(self):
@@ -60,10 +62,21 @@ class Function:
         raise StopIteration
 
     def _update(self):
-        self.inputs.update()
-        self.__ensure_index(-1)
+        if not self.finalized:
+            self.inputs.update()
+            self.__ensure_index(-1)
+
+    @property
+    def finalized(self):
+        return self.__finalized
+
+    def set_finalized(self, value=True):
+        self.__finalized = value
 
     def __ensure_index(self, index):
+        if self.finalized:
+            return
+
         while len(self) <= index if index > 0 else True:
             try:
                 if len(self._values) == 0:
