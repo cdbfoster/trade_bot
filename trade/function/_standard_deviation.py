@@ -34,7 +34,7 @@ class StandardDeviation(Function):
         if len(self.__period) == 0 or int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
+        self.inputs.sync({self.__input: int(self.__period.max)})
 
         self.__input.consume()
         period = int(min(self.__period.consume(), self.__period.max))
@@ -49,7 +49,7 @@ class StandardDeviation(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + int(self.__period.max) > len(self.__input):
+        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
         value_discard = self.__input[self.__input.consumed - 1]

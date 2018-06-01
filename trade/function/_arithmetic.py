@@ -28,7 +28,7 @@ class Add(Function):
         if len(self) >= len(self.input1) or len(self) >= len(self.input2):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         a = self.input1.consume()
         b = self.input2.consume()
@@ -48,7 +48,7 @@ class Divide(Function):
         if len(self) >= len(self.input1) or len(self) >= len(self.input2):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         a = self.input1.consume()
         b = self.input2.consume()
@@ -70,7 +70,7 @@ class Multiply(Function):
         if len(self) >= len(self.input1) or len(self) >= len(self.input2):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         a = self.input1.consume()
         b = self.input2.consume()
@@ -90,7 +90,7 @@ class Subtract(Function):
         if len(self) >= len(self.input1) or len(self) >= len(self.input2):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         a = self.input1.consume()
         b = self.input2.consume()

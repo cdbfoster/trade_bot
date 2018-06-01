@@ -35,7 +35,7 @@ class DominantBand(Function):
         if len(self) >= len(self.__bands[0]):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         self.__input.consume()
         std_devs = [band.consume() for band in self.__bands]

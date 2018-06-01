@@ -28,10 +28,10 @@ class ChangePeriod(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self) + int(self.__period.max) > len(self.__input):
+        if len(self) >= min(len(self.__change), len(self.__period)) or len(self) + int(self.__period.max) > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, int(self.__period.max))
+        self.inputs.sync({self.__input: int(self.__period.max)})
 
         self.__input.consume()
         change = self.__change.consume()

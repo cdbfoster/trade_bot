@@ -28,10 +28,10 @@ class EhlersWayBandpass(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self.__period) == 0 or len(self.__delta) == 0 or len(self) + 5 > len(self.__input):
+        if len(self) >= min(len(self.__period), len(self.__delta)) or len(self) + 5 > len(self.__input):
             raise StopIteration
 
-        self.inputs.sync_to_input_index(self.__input, 5)
+        self.inputs.sync({self.__input: 5})
 
         period = self.__period.consume()
         delta = self.__delta.consume()

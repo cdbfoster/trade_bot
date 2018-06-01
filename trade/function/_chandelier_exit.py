@@ -31,10 +31,10 @@ class ChandelierExitLong(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self.__high) == 0 or len(self) >= len(self.__atr):
+        if len(self) >= min(len(self.__atr), len(self.__high), len(self.__multiplier)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         period_count = int(min(self.__period_count.consume(), self.__period_count.max))
         self.__high.consume()
@@ -65,10 +65,10 @@ class ChandelierExitShort(Function):
     def _next(self):
         self.inputs.update()
 
-        if len(self.__low) == 0 or len(self) >= len(self.__atr):
+        if len(self) >= min(len(self.__atr), len(self.__low), len(self.__multiplier)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         period_count = int(min(self.__period_count.consume(), self.__period_count.max))
         self.__low.consume()
