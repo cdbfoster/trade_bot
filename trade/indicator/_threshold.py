@@ -30,7 +30,7 @@ class Threshold(Indicator):
         if len(self) >= min(len(self.__input), len(self.__threshold), len(self.__fuzziness)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         this_value = self.__input.consume()
         threshold = self.__threshold.consume()

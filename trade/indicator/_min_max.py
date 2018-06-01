@@ -31,7 +31,7 @@ class MinMax(Indicator):
         if len(self) >= min(len(self.__input), len(self.__min), len(self.__max), len(self.__fuzziness)):
             raise StopIteration
 
-        self.inputs.sync_to_min_length()
+        self.inputs.sync()
 
         this_value = self.__input.consume()
         min_ = self.__min.consume()
