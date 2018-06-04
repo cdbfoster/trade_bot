@@ -241,3 +241,4 @@ from ._rsi import Rsi # Needs Slope
 from ._standard_deviation import StandardDeviation
 from ._dominant_band import DominantBand # Needs EhlersWayBandpass, StandardDeviation
 from ._z_score import ZScore
+from ._entropy_ema import EntropyEma # Needs ZScore
