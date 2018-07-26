@@ -15,37 +15,18 @@
 
 import numpy as np
 
-from trade.function import Function, FunctionInput
+from trade.function import Function
 
 class Ema(Function):
-    def __init__(self, input_, period):
-        self.__input = FunctionInput(input_)
-        self.__period = FunctionInput(period)
+    def __init__(self, period):
+        self.period = period
 
-        Function.__init__(self)
+        self.__weight = 2 / (period + 1)
 
-    def _first(self):
-        self.inputs.update()
+    def _first(self, x):
+        self.__last_value = x
+        return x
 
-        if len(self.__period) == 0 or int(self.__period.max) > len(self.__input):
-            raise StopIteration
-
-        self.inputs.sync({self.__input: int(self.__period.max)})
-
-        self.__input.consume()
-        period = int(min(self.__period.consume(), self.__period.max))
-
-        self._values.append(np.mean(self.__input[self.__input.consumed - period:self.__input.consumed]))
-
-    def _next(self):
-        self.inputs.update()
-
-        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__input):
-            raise StopIteration
-
-        input_ = self.__input.consume()
-        period = int(min(self.__period.consume(), self.__period.max))
-
-        weight = 2 / (period + 1)
-
-        self._values.append((input_ - self._values[-1]) * weight + self._values[-1])
+    def _next(self, x):
+        self.__last_value = self.__weight * x + (1 - self.__weight) * self.__last_value
+        return self.__last_value
