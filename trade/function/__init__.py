@@ -15,7 +15,7 @@
 
 class Function:
     def _first(self, x):
-        return self._next(x)
+        raise NotImplementedError
 
     def _next(self, x):
         raise NotImplementedError
