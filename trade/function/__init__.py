@@ -68,7 +68,7 @@ class Function:
         except AttributeError:
             return iter([])
 
-from ._ema import Ema
+from ._ema import Ema, EmaDifference
 
 #from ._arithmetic import Add, Divide, Multiply, Subtract
 #from ._aroon import AroonUp, AroonDown, AroonOscillator
