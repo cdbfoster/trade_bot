@@ -15,7 +15,7 @@
 
 from enum import Enum
 
-from trade.function import Function, FunctionInput
+from trade.function import Function
 
 class Signal(Enum):
     BUY = 1
@@ -23,14 +23,11 @@ class Signal(Enum):
     SELL = -1
 
 class Indicator(Function):
-    def __init__(self):
-        Function.__init__(self)
+    pass
 
-class IndicatorInput(FunctionInput):
-    def __init__(self, value):
-        FunctionInput.__init__(self, value)
+from ._ema_crossover import EmaCrossover
 
-from ._crossover import Crossover
-from ._logic import And, Not, Or
-from ._min_max import MinMax
-from ._threshold import Threshold
+#from ._crossover import Crossover
+#from ._logic import And, Not, Or
+#from ._min_max import MinMax
+#from ._threshold import Threshold
