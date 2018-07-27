@@ -33,6 +33,10 @@ def return_up_price(current_price, trade_loss, transaction_fee, desired_return):
     sell_price = sell_up_price(buy_price * (1 + desired_return), trade_loss, transaction_fee)
     return sell_price
 
+def return_value(current_price, bought_price, trade_loss, transaction_fee):
+    """ If we sell at current_price having bought at bought_price, we'd make (the returned value * 100)% profit. """
+    return sell_down_price(current_price, trade_loss, transaction_fee) / bought_price - 1
+
 def sell_down_price(current_price, trade_loss, transaction_fee):
     """ If we sell at current_price, we gain as if we had sold at the returned price with no loss or fees. """
     return current_price * (1 - trade_loss) * (1 - transaction_fee)
