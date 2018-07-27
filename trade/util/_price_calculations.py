@@ -13,22 +13,30 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-def up_price(current_price, trade_loss, transaction_fee):
-    """ If we buy at current_price, we gain as if we had bought at the returned price.
-        Conversly, we can sell at the returned price to gain as if we had sold at current_price. """
-    return current_price * (1 + trade_loss) / (1 - transaction_fee)
+def buy_down_price(current_price, trade_loss, transaction_fee):
+    """ If we buy at the returned price, we gain as if we had bought at current_price with no loss or fees. """
+    return current_price / (1 + trade_loss) / (1 + transaction_fee)
 
-def down_price(current_price, trade_loss, transaction_fee):
-    """ If we sell at current_price, we gain as if we had sold at the returned price.
-        Conversly, we can buy at the returned price to gain as if we had bought at current_price. """
-    return current_price * (1 - transaction_fee) / (1 + trade_loss)
+def buy_up_price(current_price, trade_loss, transaction_fee):
+    """ If we buy at current_price, we gain as if we had bought at the returned price with no loss or fees. """
+    return current_price * (1 + trade_loss) * (1 + transaction_fee)
 
-def return_price(current_price, trade_loss, transaction_fee, desired_return, speculative=False):
-    """ If we bought (or buy, if speculative is True) at current_price, we'd have to sell at the returned price to make (100 * desired_return)% profit. """
-    buy_price = up_price(current_price, trade_loss, transaction_fee) if speculative else current_price
-    sell_price = up_price(buy_price * (1 + desired_return), trade_loss, transaction_fee)
+def return_down_price(current_price, trade_loss, transaction_fee, desired_return):
+    """ If we sell at current_price, we'd have to have bought at the returned price to make (100 * desired_return)% profit. """
+    sell_price = sell_down_price(current_price, trade_loss, transaction_fee)
+    buy_price = buy_down_price(sell_price / (1 + desired_return), trade_loss, transaction_fee)
+    return buy_price
+
+def return_up_price(current_price, trade_loss, transaction_fee, desired_return):
+    """ If we buy at current_price, we'd have to sell at the returned price to make (100 * desired_return)% profit. """
+    buy_price = buy_up_price(current_price, trade_loss, transaction_fee)
+    sell_price = sell_up_price(buy_price * (1 + desired_return), trade_loss, transaction_fee)
     return sell_price
 
-def return_value(current_price, trade_loss, transaction_fee, bought_price):
-    """ If we were to sell at current_price, given that we bought at bought_price, we'd gain the returned value. """
-    return down_price(current_price, trade_loss, transaction_fee) / bought_price - 1
+def sell_down_price(current_price, trade_loss, transaction_fee):
+    """ If we sell at current_price, we gain as if we had sold at the returned price with no loss or fees. """
+    return current_price * (1 - trade_loss) * (1 - transaction_fee)
+
+def sell_up_price(current_price, trade_loss, transaction_fee):
+    """ If we sell at the returned price, we gain as if we had sold at current_price with no loss or fees. """
+    return current_price / (1 - trade_loss) / (1 - transaction_fee)

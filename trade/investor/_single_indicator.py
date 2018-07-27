@@ -16,7 +16,7 @@
 from trade.indicator import Signal
 from trade.investor import Investor
 from trade.market import OrderSide, OrderType
-from trade.util import down_price, return_value, up_price
+# XXX from trade.util import down_price, return_value, up_price
 
 class SingleIndicator(Investor):
     class _Investment:

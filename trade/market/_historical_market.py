@@ -15,7 +15,7 @@
 
 from trade.function import HistoricalInput
 from trade.market import Market, OrderSide, OrderType
-from trade.util import down_price, up_price
+# XXX from trade.util import down_price, up_price
 
 class HistoricalMarket(Market, HistoricalInput):
     def __init__(self, exchange_currency, base_currency, filename, trade_loss=0.001, transaction_fee=0.0025, start=None, position=None, reverse=False):
