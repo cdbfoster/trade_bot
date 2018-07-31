@@ -25,6 +25,7 @@ class Signal(Enum):
 class Indicator(Function):
     pass
 
+from ._benchmark import Benchmark
 from ._ema_crossover import EmaCrossover
 
 #from ._crossover import Crossover
