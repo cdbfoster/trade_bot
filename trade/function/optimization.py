@@ -39,5 +39,9 @@ class Optimizable:
         raise NotImplementedError
 
 class Optimizer:
-    def optimize(function_class, acceptance_function, input):
+    def optimize_parameters(function_class, acceptance_function):
+        raise NotImplementedError
+
+class AcceptanceFunction:
+    def acceptance_score(self, function):
         raise NotImplementedError

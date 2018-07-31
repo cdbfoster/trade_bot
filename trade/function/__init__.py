@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import optimization
-
 class Function:
     def _first(self, x):
         raise NotImplementedError
@@ -67,6 +65,8 @@ class Function:
             return iter(self.__values)
         except AttributeError:
             return iter([])
+
+from . import optimization
 
 from ._ema import Ema, EmaDifference
 
