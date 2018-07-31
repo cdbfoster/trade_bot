@@ -16,9 +16,10 @@
 import math
 
 from trade.function import EmaDifference
+from trade.function.optimization import IntParameter, Optimizable
 from trade.indicator import Indicator, Signal
 
-class EmaCrossover(Indicator):
+class EmaCrossover(Indicator, Optimizable):
     def __init__(self, short_period, long_period):
         if short_period >= long_period:
             raise ValueError
@@ -42,3 +43,9 @@ class EmaCrossover(Indicator):
             return Signal.BUY if this_value > 0 else Signal.SELL
         else:
             return Signal.HOLD
+
+    def optimizable_parameters():
+        return [
+            IntParameter(minimum=3, maximum=15000), # short_period
+            IntParameter(minimum=3, maximum=15000), # long_period
+        ]
