@@ -13,74 +13,140 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-from trade.function import Function, FunctionInput
-
-class AroonUp(Function):
-    def __init__(self, input_, period):
-        self.__input = FunctionInput(input_)
-        self.__period = FunctionInput(period)
-
-        Function.__init__(self)
-
-    def _next(self):
-        self.inputs.update()
-
-        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__input):
-            raise StopIteration
-
-        self.inputs.sync({self.__input: int(self.__period.max)})
-
-        self.__input.consume()
-        period = int(min(self.__period.consume(), self.__period.max))
-
-        high = (None, None)
-        for i in range(self.__input.consumed - period - 1, self.__input.consumed):
-            if high[0] is not None and self.__input[i] > high[0] or high[0] is None:
-                high = (self.__input[i], self.__input.consumed - i)
-
-        self._values.append(100 * (period - high[1]) / period)
+from trade.function import Function
 
 class AroonDown(Function):
-    def __init__(self, input_, period):
-        self.__input = FunctionInput(input_)
-        self.__period = FunctionInput(period)
+    def __init__(self, period):
+        self.period = period
 
-        Function.__init__(self)
+    def _first(self, x):
+        self.__low = x
+        self.__low_index = 0
+        self.__values = [x]
+        self.__index = 0
 
-    def _next(self):
-        self.inputs.update()
+        return 100
 
-        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__input):
-            raise StopIteration
+    def _next(self, x):
+        if len(self.__values) == self.period + 1:
+            self.__values[self.__index] = x
+            self.__index += 1
+            self.__index %= self.period + 1
+        else:
+            self.__values.append(x)
 
-        self.inputs.sync({self.__input: int(self.__period.max)})
+        if x < self.__low:
+            self.__low = x
+            self.__low_index = 0
+        else:
+            self.__low_index += 1
 
-        self.__input.consume()
-        period = int(min(self.__period.consume(), self.__period.max))
+            if self.__low_index > self.period:
+                self.__low_index = (self.__index - 1) % (self.period + 1)
+                self.__low = self.__values[self.__low_index]
 
-        low = (None, None)
-        for i in range(self.__input.consumed - period - 1, self.__input.consumed):
-            if low[0] is not None and self.__input[i] < low[0] or low[0] is None:
-                low = (self.__input[i], self.__input.consumed - i)
+                for i in range(1, self.period + 1):
+                    j = (self.__index - 1 - i) % (self.period + 1)
 
-        self._values.append(100 * (period - low[1]) / period)
+                    if self.__values[j] < self.__low:
+                        self.__low = self.__values[j]
+                        self.__low_index = j
+
+        return 100 * (1 - self.__low_index / self.period)
 
 class AroonOscillator(Function):
-    def __init__(self, input_, period):
-        self.__up = FunctionInput(AroonUp(input_, period))
-        self.__down = FunctionInput(AroonDown(input_, period))
+    def __init__(self, period):
+        self.period = period
 
-        Function.__init__(self)
+    def _first(self, x):
+        self.__high = x
+        self.__high_index = 0
+        self.__low = x
+        self.__low_index = 0
+        self.__values = [x]
+        self.__index = 0
 
-    def _next(self):
-        self.inputs.update()
+        return 0
 
-        if len(self) >= len(self.__up):
-            raise StopIteration
+    def _next(self, x):
+        if len(self.__values) == self.period + 1:
+            self.__values[self.__index] = x
+            self.__index += 1
+            self.__index %= self.period + 1
+        else:
+            self.__values.append(x)
 
-        self.inputs.sync()
+        if x > self.__high:
+            self.__high = x
+            self.__high_index = 0
+        else:
+            self.__high_index += 1
 
-        up = self.__up.consume()
-        down = self.__down.consume()
+        if x < self.__low:
+            self.__low = x
+            self.__low_index = 0
+        else:
+            self.__low_index += 1
 
-        self._values.append(up - down)
+        find_high = self.__high_index > self.period
+        find_low = self.__low_index > self.period
+
+        if find_high:
+            self.__high_index = (self.__index - 1) % (self.period + 1)
+            self.__high = self.__values[self.__high_index]
+        if find_low:
+            self.__low_index = (self.__index - 1) % (self.period + 1)
+            self.__low = self.__values[self.__low_index]
+
+        if find_high or find_low:
+            for i in range(1, self.period + 1):
+                j = (self.__index - 1 - i) % (self.period + 1)
+
+                if find_high and self.__values[j] > self.__high:
+                    self.__high = self.__values[j]
+                    self.__high_index = j
+
+                if find_low and self.__values[j] < self.__low:
+                    self.__low = self.__values[j]
+                    self.__low_index = j
+
+        return 100 * (self.__low_index - self.__high_index) / self.period
+
+class AroonUp(Function):
+    def __init__(self, period):
+        self.period = period
+
+    def _first(self, x):
+        self.__high = x
+        self.__high_index = 0
+        self.__values = [x]
+        self.__index = 0
+
+        return 100
+
+    def _next(self, x):
+        if len(self.__values) == self.period + 1:
+            self.__values[self.__index] = x
+            self.__index += 1
+            self.__index %= self.period + 1
+        else:
+            self.__values.append(x)
+
+        if x > self.__high:
+            self.__high = x
+            self.__high_index = 0
+        else:
+            self.__high_index += 1
+
+            if self.__high_index > self.period:
+                self.__high_index = (self.__index - 1) % (self.period + 1)
+                self.__high = self.__values[self.__high_index]
+
+                for i in range(1, self.period + 1):
+                    j = (self.__index - 1 - i) % (self.period + 1)
+
+                    if self.__values[j] > self.__high:
+                        self.__high = self.__values[j]
+                        self.__high_index = j
+
+        return 100 * (1 - self.__high_index / self.period)
