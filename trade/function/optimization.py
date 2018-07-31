@@ -45,3 +45,5 @@ class Optimizer:
 class AcceptanceFunction:
     def acceptance_score(self, function):
         raise NotImplementedError
+
+from ._grid_optimizer import GridOptimizer
