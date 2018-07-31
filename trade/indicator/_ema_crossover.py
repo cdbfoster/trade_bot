@@ -39,7 +39,7 @@ class EmaCrossover(Indicator, Optimizable):
 
         self.__last_value = this_value
 
-        if math.copysign(1, this_value) != math.copysign(1, last_value):
+        if math.copysign(1, this_value) != math.copysign(1, last_value) and len(self) >= self.long_period:
             return Signal.BUY if this_value > 0 else Signal.SELL
         else:
             return Signal.HOLD
