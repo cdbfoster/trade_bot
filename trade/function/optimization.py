@@ -47,3 +47,4 @@ class AcceptanceFunction:
         raise NotImplementedError
 
 from ._grid_optimizer import GridOptimizer
+from ._metropolis_optimizer import MetropolisOptimizer
