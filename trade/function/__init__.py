@@ -68,10 +68,11 @@ class Function:
 
 from . import optimization
 
+from ._aroon import AroonDown, AroonOscillator, AroonUp
 from ._ema import Ema, EmaDifference
+from ._rsi import Rsi
 
 #from ._arithmetic import Add, Divide, Multiply, Subtract
-from ._aroon import AroonDown, AroonOscillator, AroonUp
 #from ._atr import Atr
 #from ._change_period import ChangePeriod
 #from ._ehlers_way_bandpass import EhlersWayBandpass

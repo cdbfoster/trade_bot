@@ -13,49 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy as np
-
-from trade.function import Function, FunctionInput, Slope
+from trade.function import Function
 
 class Rsi(Function):
-    def __init__(self, input_, period):
-        self.__input = FunctionInput(input_)
-        self.__period = FunctionInput(period)
+    def __init__(self, period):
+        self.period = period
 
-        self.__slope = FunctionInput(Slope(input_))
-        self.__average_gain = None
-        self.__average_loss = None
+    def _first(self, x):
+        self.__last_input = x
+        self.__average_gain = 0
+        self.__average_loss = 0
 
-        Function.__init__(self)
+        return 50
 
-    def _first(self):
-        self.inputs.update()
+    def _next(self, x):
+        dx = x - self.__last_input
 
-        if len(self.__period) == 0 or int(self.__period.max) > len(self.__slope):
-            raise StopIteration
+        self.__last_input = x
+        self.__average_gain = (self.__average_gain * (self.period - 1) + max(dx, 0)) / self.period
+        self.__average_loss = (self.__average_loss * (self.period - 1) + min(dx, 0)) / self.period
 
-        self.inputs.sync({self.__slope: int(self.__period.max)})
-
-        self.__input.consume()
-        period = int(min(self.__period.consume(), self.__period.max))
-        self.__slope.consume()
-
-        self.__average_gain = np.mean([max(d, 0) for d in self.__slope[self.__slope.consumed - period:self.__slope.consumed]])
-        self.__average_loss = np.mean([min(d, 0) for d in self.__slope[self.__slope.consumed - period:self.__slope.consumed]])
-
-        self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss)) # XXX We'll need some kind of zero division protection
-
-    def _next(self):
-        self.inputs.update()
-
-        if len(self) >= len(self.__period) or len(self) + int(self.__period.max) > len(self.__slope):
-            raise StopIteration
-
-        self.__input.consume()
-        period = int(min(self.__period.consume(), self.__period.max))
-        slope = self.__slope.consume()
-
-        self.__average_gain = (self.__average_gain * (period - 1) + max(slope, 0)) / period
-        self.__average_loss = (self.__average_loss * (period - 1) + min(slope, 0)) / period
-
-        self._values.append(100 - 100 / (1 + self.__average_gain / -self.__average_loss))
+        if self.__average_loss != 0:
+            return 100 - 100 / (1 + self.__average_gain / -self.__average_loss))
+        else:
+            return 100
