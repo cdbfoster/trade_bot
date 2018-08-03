@@ -26,6 +26,7 @@ class Indicator(Function):
     pass
 
 from ._benchmark import Benchmark
+from ._aroon import AroonOscillatorCrossover, AroonOscillatorMinMax
 from ._ema_crossover import EmaCrossover
 
 #from ._crossover import Crossover
