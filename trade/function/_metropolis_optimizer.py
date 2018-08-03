@@ -28,6 +28,10 @@ class MetropolisOptimizer(Optimizer):
 
         parameters = function_class.optimizable_parameters()
 
+        if self.verbose:
+            print("Optimizing...")
+            print("   0%")
+
         position, function = self.__starting_position(parameters, function_class)
         acceptance_score = acceptance_function.acceptance_score(function)
         self.path.append((position, acceptance_score))
@@ -36,6 +40,14 @@ class MetropolisOptimizer(Optimizer):
         best_acceptance_score = acceptance_score
 
         for i in range(1, self.iterations):
+            if self.verbose and i % (self.iterations // 20) == 0:
+                print(" {:3.0f}%, best: ({}, {:.3}), current: ({}, {:.3})".format(
+                    i // (self.iterations // 20) * 100 / 20,
+                    best_position, best_acceptance_score,
+                    self.path[-1][0], self.path[-1][1],
+                ))
+
+
             next_position, next_function = self.__next_position(parameters, function_class, position)
             next_acceptance_score = acceptance_function.acceptance_score(next_function)
 
@@ -47,6 +59,9 @@ class MetropolisOptimizer(Optimizer):
                 if acceptance_score > best_acceptance_score:
                     best_position = position
                     best_acceptance_score = acceptance_score
+
+        if self.verbose and (self.iterations - 1) % (self.iterations // 20) != 0:
+            print(" 100%, best: ({}, {:.3})".format(best_position, best_acceptance_score))
 
         self.acceptance_ratio = len(self.path) / self.iterations
 
