@@ -28,12 +28,16 @@ class Rsi(Function):
 
     def _next(self, x):
         dx = x - self.__last_input
-
         self.__last_input = x
-        self.__average_gain = (self.__average_gain * (self.period - 1) + max(dx, 0)) / self.period
-        self.__average_loss = (self.__average_loss * (self.period - 1) + min(dx, 0)) / self.period
+
+        if len(self) > self.period:
+            self.__average_gain = (self.__average_gain * (self.period - 1) + max(dx, 0)) / self.period
+            self.__average_loss = (self.__average_loss * (self.period - 1) + min(dx, 0)) / self.period
+        else:
+            self.__average_gain = (self.__average_gain * (len(self) - 1) + max(dx, 0)) / len(self)
+            self.__average_loss = (self.__average_loss * (len(self) - 1) + min(dx, 0)) / len(self)
 
         if self.__average_loss != 0:
-            return 100 - 100 / (1 + self.__average_gain / -self.__average_loss))
+            return 100 - 100 / (1 + self.__average_gain / -self.__average_loss)
         else:
             return 100
