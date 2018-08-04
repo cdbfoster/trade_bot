@@ -47,7 +47,12 @@ class Grapher:
 
             for i, range_ in enumerate(self.ranges):
                 if len(range_) > 0 and not isinstance(range_[0], Signal):
-                    plt.plot(self.time[len(self.time) - len(range_):], range_, Grapher._Plot.colors[i % len(Grapher._Plot.colors)] + '-')
+                    if hasattr(range_[0], "__len__") and len(range_[0]) == 2:
+                        x = [p[0] for p in range_]
+                        y = [p[1] for p in range_]
+                        plt.plot(x, y, Grapher._Plot.colors[i % len(Grapher._Plot.colors)] + ('.' if len(range_) < 1000 else ','))
+                    else:
+                        plt.plot(self.time[len(self.time) - len(range_):], range_, Grapher._Plot.colors[i % len(Grapher._Plot.colors)] + '-')
                 elif not isinstance(self.ranges[0], Indicator):
                     buy_time = [self.time[len(self.time) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.BUY]
                     buy_price = [self.ranges[0][len(self.ranges[0]) - len(range_) + i] for i, signal in enumerate(range_) if signal is Signal.BUY]
