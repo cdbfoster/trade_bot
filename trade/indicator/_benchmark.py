@@ -30,14 +30,14 @@ class Benchmark(Indicator, AcceptanceFunction):
         if len(Function.evaluate_sequence(self, sequence)) == 0:
             return []
 
-        for _, index, signal in self.__extrema:
+        for _, index, signal in self.extrema:
             self._Function__values[index] = signal
 
     def _first(self, x):
         self.__local_max = (x, 0, Signal.SELL)
         self.__local_min = (x, 0, Signal.BUY)
 
-        self.__extrema = []
+        self.extrema = []
 
         return Signal.HOLD
 
@@ -49,11 +49,11 @@ class Benchmark(Indicator, AcceptanceFunction):
         elif x <= self.__local_min[0]:
             self.__local_min = (x, index, Signal.BUY)
 
-        if x < self.__local_max[0] / self.__swing and (len(self.__extrema) == 0 or self.__extrema[-1] is not self.__local_max):
-            self.__extrema.append(self.__local_max)
+        if x < self.__local_max[0] / self.__swing and (len(self.extrema) == 0 or self.extrema[-1] is not self.__local_max):
+            self.extrema.append(self.__local_max)
             self.__local_min = (x, index, Signal.BUY)
-        elif x > self.__local_min[0] * self.__swing and (len(self.__extrema) == 0 or self.__extrema[-1] is not self.__local_min):
-            self.__extrema.append(self.__local_min)
+        elif x > self.__local_min[0] * self.__swing and (len(self.extrema) == 0 or self.extrema[-1] is not self.__local_min):
+            self.extrema.append(self.__local_min)
             self.__local_max = (x, index, Signal.SELL)
 
         return Signal.HOLD
