@@ -15,5 +15,6 @@
 
 from ._grapher import Grapher
 from ._price_calculations import buy_down_price, buy_up_price, return_down_price, return_up_price, return_value, sell_down_price, sell_up_price
+from ._time_series_generator import TimeSeriesGenerator
 from ._tradebenchmarker import TradeBenchmarker
 from ._websocketclient import WebSocketClient
