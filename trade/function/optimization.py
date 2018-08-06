@@ -26,8 +26,8 @@ class OptimizableParameter:
 
 class FloatParameter(OptimizableParameter):
     def __init__(self, minimum=float("-inf"), maximum=float("inf")):
-        self._minimum = minimum
-        self._maximum = maximum
+        self._minimum = float(minimum)
+        self._maximum = float(maximum)
 
 class IntParameter(OptimizableParameter):
     def __init__(self, minimum=(-sys.maxsize - 1), maximum=sys.maxsize):
