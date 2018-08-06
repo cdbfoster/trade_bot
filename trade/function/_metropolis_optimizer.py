@@ -41,12 +41,11 @@ class MetropolisOptimizer(Optimizer):
 
         for i in range(1, self.iterations):
             if self.verbose and i % (self.iterations // 20) == 0:
-                print(" {:3.0f}%, best: ({}, {:.3}), current: ({}, {:.3})".format(
+                print(" {:3.0f}%, best: ({}, {:.3f}), acceptance ratio: {:.4f}".format(
                     i // (self.iterations // 20) * 100 / 20,
                     best_position, best_acceptance_score,
-                    self.path[-1][0], self.path[-1][1],
+                    self.acceptance_ratio,
                 ))
-
 
             next_position, next_function = self.__next_position(parameters, function_class, position)
             next_acceptance_score = acceptance_function.acceptance_score(next_function)
@@ -60,10 +59,10 @@ class MetropolisOptimizer(Optimizer):
                     best_position = position
                     best_acceptance_score = acceptance_score
 
-        if self.verbose and (self.iterations - 1) % (self.iterations // 20) != 0:
-            print(" 100%, best: ({}, {:.3})".format(best_position, best_acceptance_score))
+            self.acceptance_ratio = len(self.path) / i if len(self.path) > 0 else 0.0
 
-        self.acceptance_ratio = len(self.path) / self.iterations
+        if self.verbose and (self.iterations - 1) % (self.iterations // 20) != 0:
+            print(" 100%, best: ({}, {:.3}), acceptance ratio: {:.4f}".format(best_position, best_acceptance_score, self.acceptance_ratio))
 
         return best_position
 
