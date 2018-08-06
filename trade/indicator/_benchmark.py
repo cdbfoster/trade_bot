@@ -98,4 +98,4 @@ class Benchmark(Indicator, AcceptanceFunction):
         return value - 1
 
     def acceptance_score(self, indicator):
-        return self.indicator_return(indicator)
+        return (self.indicator_return(indicator) + 1) / (self.maximum_return() + 1)
