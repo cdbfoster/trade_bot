@@ -28,3 +28,4 @@ class Indicator(Function):
 from ._benchmark import Benchmark
 from ._aroon import AroonOscillatorCrossover, AroonOscillatorMinMax
 from ._ema_crossover import EmaCrossover
+from ._rsi import Rsi
