@@ -98,3 +98,31 @@ class Benchmark(Indicator):
 
     def relative_return(self, indicator):
         return (self.indicator_return(indicator) + 1) / (self.maximum_return() + 1)
+
+    def indicator_similarity(self, indicator):
+        if len(indicator) == 0:
+            indicator.evaluate_sequence(self.sequence)
+        elif len(indicator) != len(self):
+            raise RuntimeError("indicator has a different length than the benchmark")
+
+        buys = [x for x in enumerate(indicator) if x[1] is Signal.BUY]
+        sells = [x for x in enumerate(indicator) if x[1] is Signal.SELL]
+
+        total_score = 0
+        for i, extreme in enumerate(self.extrema):
+            count = 0
+            score = 0
+            start = self.extrema[i - 1][1] if i > 0 else extreme[1]
+            end = self.extrema[i + 1][1] if i < len(self.extrema) - 1 else extreme[1]
+
+            for event in (buys if extreme[2] is Signal.BUY else sells):
+                if event[0] >= start and event[0] <= end:
+                    count += 1
+                    score += (1 - abs(extreme[1] - event[0]) / ((extreme[1] - start) if event[0] < extreme[1] else (end - extreme[1]))) if event[0] != extreme[1] else 1
+
+                if event[0] > end:
+                    break
+
+            total_score += (score / count) if count > 0 else 0
+
+        return total_score / len(self.extrema)
