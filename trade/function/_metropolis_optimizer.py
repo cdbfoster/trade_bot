@@ -33,7 +33,7 @@ class MetropolisOptimizer(Optimizer):
             print("   0%")
 
         position, function = self.__starting_position(parameters, function_class)
-        acceptance_score = acceptance_function.acceptance_score(function)
+        acceptance_score = acceptance_function(function)
         self.path.append((position, acceptance_score))
 
         best_position = position
@@ -48,7 +48,7 @@ class MetropolisOptimizer(Optimizer):
                 ))
 
             next_position, next_function = self.__next_position(parameters, function_class, position)
-            next_acceptance_score = acceptance_function.acceptance_score(next_function)
+            next_acceptance_score = acceptance_function(next_function)
 
             if next_acceptance_score >= acceptance_score or np.random.uniform() > next_acceptance_score / max(acceptance_score, 0.00001):
                 position = next_position

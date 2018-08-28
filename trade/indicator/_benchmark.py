@@ -14,11 +14,10 @@
 # along with trade_bot.  If not, see <http://www.gnu.org/licenses/>.
 
 from trade.function import Function
-from trade.function.optimization import AcceptanceFunction
 from trade.indicator import Indicator, Signal
 from trade.util import buy_down_price, buy_up_price, sell_down_price
 
-class Benchmark(Indicator, AcceptanceFunction):
+class Benchmark(Indicator):
     def __init__(self, trade_loss, transaction_fee, sequence, minimum_return=0):
         self.trade_loss = trade_loss
         self.transaction_fee = transaction_fee
@@ -97,5 +96,5 @@ class Benchmark(Indicator, AcceptanceFunction):
 
         return value - 1
 
-    def acceptance_score(self, indicator):
+    def relative_return(self, indicator):
         return (self.indicator_return(indicator) + 1) / (self.maximum_return() + 1)

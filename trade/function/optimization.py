@@ -42,9 +42,5 @@ class Optimizer:
     def optimize_parameters(function_class, acceptance_function):
         raise NotImplementedError
 
-class AcceptanceFunction:
-    def acceptance_score(self, function):
-        raise NotImplementedError
-
 from ._grid_optimizer import GridOptimizer
 from ._metropolis_optimizer import MetropolisOptimizer
