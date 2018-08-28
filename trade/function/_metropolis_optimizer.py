@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from trade.function.optimization import IntParameter, Optimizer
+from trade.function.optimization import FixedParameter, IntParameter, Optimizer
 
 class MetropolisOptimizer(Optimizer):
     def __init__(self, iterations, std, verbose=False):
@@ -85,7 +85,10 @@ class MetropolisOptimizer(Optimizer):
                 std = (p.maximum - p.minimum) * self.std
 
                 while True:
-                    sample = np.random.normal(position[i], std)
+                    if not isinstance(p, FixedParameter):
+                        sample = np.random.normal(position[i], std)
+                    else:
+                        sample = p.value
 
                     if isinstance(p, IntParameter):
                         sample = int(sample)

@@ -15,7 +15,7 @@
 
 import numpy as np
 
-from trade.function.optimization import IntParameter, Optimizer
+from trade.function.optimization import FixedParameter, IntParameter, Optimizer
 
 class GridOptimizer(Optimizer):
     def __init__(self, divisions, verbose=False):
@@ -24,12 +24,14 @@ class GridOptimizer(Optimizer):
 
     def optimize_parameters(self, function_class, acceptance_function):
         parameters = function_class.optimizable_parameters()
-        ranges = [np.linspace(p.minimum, p.maximum, num=self.divisions) for p in parameters]
+        ranges = [np.linspace(p.minimum, p.maximum, num=self.divisions) if not isinstance(p, FixedParameter) else [p.value] for p in parameters]
         lengths = [len(range_) for range_ in ranges]
 
         for i, parameter in enumerate(parameters):
             if isinstance(parameter, IntParameter):
                 ranges[i] = [int(x) for x in ranges[i]]
+            elif isinstance(parameter, FixedParameter):
+                continue
 
             ranges[i] = np.unique(ranges[i])
 

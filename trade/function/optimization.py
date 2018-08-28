@@ -34,6 +34,12 @@ class IntParameter(OptimizableParameter):
         self._minimum = minimum
         self._maximum = maximum
 
+class FixedParameter(OptimizableParameter):
+    def __init__(self, value):
+        self.value = value
+        self._minimum = value
+        self._maximum = value
+
 class Optimizable:
     def optimizable_parameters():
         raise NotImplementedError
