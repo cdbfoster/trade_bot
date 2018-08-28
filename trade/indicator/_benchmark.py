@@ -70,7 +70,7 @@ class Benchmark(Indicator):
             self.__maximum_return = self.indicator_return(self)
             return self.__maximum_return
 
-    def indicator_return(self, indicator):
+    def indicator_return(self, indicator, final_sell=False):
         if len(indicator) == 0:
             indicator.evaluate_sequence(self.sequence)
         elif len(indicator) != len(self):
@@ -91,7 +91,7 @@ class Benchmark(Indicator):
             elif bought is not None and signal is Signal.SELL:
                 value *= sell_down_price(price, self.trade_loss, self.transaction_fee) / bought
                 bought = None
-        if bought is not None:
+        if bought is not None and final_sell:
             value *= sell_down_price(self.sequence[-1], self.trade_loss, self.transaction_fee) / bought
 
         return value - 1
