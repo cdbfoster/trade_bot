@@ -30,11 +30,11 @@ class EmaCrossover(Indicator, Optimizable):
         self.__ema_difference = EmaDifference(short_period, long_period)
 
     def _first(self, x):
-        self.__last_value = self.__ema_difference._first(x)
+        self.__last_value = self.__ema_difference.evaluate(x)
         return Signal.HOLD
 
     def _next(self, x):
-        this_value = self.__ema_difference._next(x)
+        this_value = self.__ema_difference.evaluate(x)
         last_value = self.__last_value
 
         self.__last_value = this_value

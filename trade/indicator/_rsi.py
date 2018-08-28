@@ -25,11 +25,11 @@ class Rsi(Indicator, Optimizable):
         self.__rsi = RsiFunction(period)
 
     def _first(self, x):
-        self.__rsi._first(x)
+        self.__rsi.evaluate(x)
         return Signal.HOLD
 
     def _next(self, x):
-        rsi = self.__rsi._next(x)
+        rsi = self.__rsi.evaluate(x)
 
         if rsi < self.threshold and len(self) >= self.period:
             return Signal.BUY

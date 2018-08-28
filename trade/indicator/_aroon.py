@@ -26,11 +26,11 @@ class AroonOscillatorCrossover(Indicator, Optimizable):
         self.__ao = AroonOscillator(period)
 
     def _first(self, x):
-        self.__last_value = self.__ao._first(x)
+        self.__last_value = self.__ao.evaluate(x)
         return Signal.HOLD
 
     def _next(self, x):
-        this_value = self.__ao._next(x)
+        this_value = self.__ao.evaluate(x)
         last_value = self.__last_value
 
         self.__last_value = this_value
@@ -53,11 +53,11 @@ class AroonOscillatorMinMax(Indicator, Optimizable):
         self.__ao = AroonOscillator(period)
 
     def _first(self, x):
-        self.__ao._first(x)
+        self.__ao.evaluate(x)
         return Signal.HOLD
 
     def _next(self, x):
-        ao = self.__ao._next(x)
+        ao = self.__ao.evaluate(x)
         if abs(ao) >= 100 * (1 - self.fuzziness) and len(self) >= self.period:
             return Signal.SELL if ao > 0 else Signal.BUY
         else:
