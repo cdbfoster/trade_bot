@@ -120,7 +120,7 @@ class Benchmark(Indicator):
             for event in (buys if extreme[2] is Signal.BUY else sells):
                 if event[0] >= start and event[0] <= end:
                     count += 1
-                    score += (1 - abs(extreme[1] - event[0]) / ((extreme[1] - start) if event[0] < extreme[1] else (end - extreme[1]))) if event[0] != extreme[1] else 1
+                    score += 1 - abs(extreme[1] - event[0]) / (extreme[1] - start if event[0] < extreme[1] else end - extreme[1]) if event[0] != extreme[1] else 1
 
                 if event[0] > end:
                     break
