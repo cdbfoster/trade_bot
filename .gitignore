@@ -1,3 +1,5 @@
 .~*
+Cargo.lock
 misc
+target
 __pycache__
